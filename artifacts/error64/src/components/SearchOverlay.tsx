@@ -89,7 +89,7 @@ export function SearchOverlay() {
           background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
           padding: '12px 16px', marginBottom: '16px', backdropFilter: 'blur(10px)',
         }}>
-          <FluentIcon name="search" size={20} />
+          <FluentIcon name="search" size={20} white />
           <input
             ref={inputRef}
             value={query}
@@ -192,7 +192,7 @@ function ResultItem({ icon, label, subtitle, onClick }: { icon: string; label: s
         color: '#fff', borderRadius: '2px',
       }}
     >
-      <FluentIcon name={icon} size={20} />
+      <FluentIcon name={icon} size={20} white />
       <div>
         <div style={{ fontSize: '13px' }}>{label}</div>
         {subtitle && <div style={{ fontSize: '11px', opacity: 0.6 }}>{subtitle}</div>}

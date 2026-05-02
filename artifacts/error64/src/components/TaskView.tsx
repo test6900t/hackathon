@@ -87,7 +87,7 @@ export function TaskView() {
                 onMouseEnter={e => (e.currentTarget.style.borderColor = '#0078D4')}
                 onMouseLeave={e => (e.currentTarget.style.borderColor = 'transparent')}
               >
-                <FluentIcon name={win.icon} size={48} />
+                <FluentIcon name={win.icon} size={48} color="#333" />
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '24px', background: '#f3f3f3', display: 'flex', alignItems: 'center', padding: '0 8px', gap: '4px' }}>
                   <FluentIcon name={win.icon} size={12} />
                   <span style={{ fontSize: '11px', color: '#333' }}>{win.title}</span>

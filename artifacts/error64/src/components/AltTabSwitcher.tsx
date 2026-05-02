@@ -51,7 +51,7 @@ export function AltTabSwitcher() {
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
             }}
           >
-            <FluentIcon name={win.icon} size={48} />
+            <FluentIcon name={win.icon} size={48} white />
             <div style={{ fontSize: '11px', color: '#fff', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>
               {win.title}
             </div>

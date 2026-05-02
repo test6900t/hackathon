@@ -285,41 +285,69 @@ function ResizeHandle({ dir, onMouseDown }: {
   );
 }
 
-export function FluentIcon({ name, size = 16, color }: { name: string; size?: number; color?: string }) {
-  const [failed, setFailed] = useState(false);
-  const urls = [
-    `https://cdn.jsdelivr.net/npm/@fluentui/svg-icons/icons/${name}_${size}_regular.svg`,
+export function FluentIcon({ name, size = 16, color, white }: { name: string; size?: number; color?: string; white?: boolean }) {
+  const [srcIndex, setSrcIndex] = useState(0);
+
+  const candidates = [
+    `https://cdn.jsdelivr.net/npm/@fluentui/svg-icons/icons/${name}_${size >= 32 ? 32 : size >= 20 ? 20 : 16}_regular.svg`,
     `https://cdn.jsdelivr.net/npm/@fluentui/svg-icons/icons/${name}_24_regular.svg`,
     `https://cdn.jsdelivr.net/npm/@fluentui/svg-icons/icons/${name}_32_regular.svg`,
+    `https://cdn.jsdelivr.net/npm/@fluentui/svg-icons/icons/${name}_48_regular.svg`,
+    `https://cdn.jsdelivr.net/npm/@fluentui/svg-icons/icons/${name}_16_regular.svg`,
   ];
 
-  if (failed) return <FallbackIcon name={name} size={size} color={color} />;
+  const failed = srcIndex >= candidates.length;
+  if (failed) return <FallbackIcon name={name} size={size} color={color} white={white} />;
+
+  const filterStyle = white
+    ? 'brightness(0) invert(1)'
+    : color
+      ? `brightness(0) saturate(100%) invert(1) sepia(1) hue-rotate(180deg)`
+      : undefined;
 
   return (
     <img
-      src={urls[0]}
+      src={candidates[srcIndex]}
       alt={name}
       width={size}
       height={size}
-      style={{ objectFit: 'contain', filter: color ? `drop-shadow(0 0 0 ${color})` : undefined }}
-      onError={() => setFailed(true)}
+      style={{ objectFit: 'contain', filter: filterStyle, flexShrink: 0 }}
+      onError={() => setSrcIndex(i => i + 1)}
       draggable={false}
     />
   );
 }
 
 const ICON_MAP: Record<string, string> = {
-  notepad: '📄', explorer: '📁', calculator: '🔢', cmd: '⬛', paint: '🎨',
-  settings: '⚙️', browser: '🌐', calendar: '📅', mail: '📧', taskmanager: '📊',
-  controlpanel: '🔧', photos: '🖼', camera: '📷', mediaplayer: '▶️',
-  wordpad: '📝', snipping: '✂️', charmap: '🔤', sysinfo: 'ℹ️',
-  diskcleanup: '🗑', eventviewer: '📋', osk: '⌨️', about: 'ℹ️',
-  msstore: '🛒', paint3d: '🎭', folder: '📁',
+  // App IDs
+  notepad: '📄', calculator: '🔢', cmd: '⬛', paint: '🎨', settings: '⚙️',
+  browser: '🌐', calendar: '📅', mail: '📧', taskmanager: '📊', controlpanel: '🔧',
+  photos: '🖼️', camera: '📷', mediaplayer: '▶️', wordpad: '📝', snipping: '✂️',
+  charmap: '🔤', sysinfo: 'ℹ️', diskcleanup: '🗑️', eventviewer: '📋', osk: '⌨️',
+  about: 'ℹ️', msstore: '🛒', paint3d: '🎭', magnifier: '🔍', sticky: '📌',
+  // Fluent icon names used in the app
+  folder: '📁', folder_open: '📂', globe: '🌐', image: '🖼️', play_circle: '▶️',
+  task_list_square_ltr: '📋', apps_list: '🔧', prompt: '⬛', screenshot: '✂️',
+  note: '📌', desktop_pc: '🖥️', delete: '🗑️', paint_bucket: '🎨',
+  calendar_ltr: '📅', search: '🔍', power: '⏻', arrow_clockwise: '🔄',
+  sleep: '😴', alert: '🔔', speaker_off: '🔇', speaker_1: '🔉', speaker_2: '🔊',
+  wifi_1: '📶', battery_10: '🔋', settings_cog: '⚙️', info: 'ℹ️',
+  text_font: '🔤', hard_drive: '💾', history: '📋', zoom_in: '🔍',
+  keyboard: '⌨️', cube: '🎭', phone_laptop: '📱', person_support: '🙋',
+  shield_checkmark: '🛡️', document: '📄', terminal: '💻', chat_help: '💬',
+  desktop_computer: '🖥️', store_microsoft: '🛒',
 };
 
-function FallbackIcon({ name, size, color }: { name: string; size: number; color?: string }) {
+function FallbackIcon({ name, size, color, white }: { name: string; size: number; color?: string; white?: boolean }) {
   const emoji = ICON_MAP[name] || '📄';
   return (
-    <span style={{ fontSize: size * 0.8, lineHeight: 1, color: color || 'inherit' }}>{emoji}</span>
+    <span style={{
+      fontSize: Math.max(size * 0.72, 10),
+      lineHeight: 1,
+      color: color || 'inherit',
+      filter: white ? 'grayscale(0)' : undefined,
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      width: size, height: size, flexShrink: 0,
+    }}>{emoji}</span>
   );
 }

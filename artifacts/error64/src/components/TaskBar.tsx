@@ -106,13 +106,13 @@ export function TaskBar() {
             width: '220px', fontSize: '13px', color: 'rgba(255,255,255,0.75)',
           }}
         >
-          <FluentIcon name="search" size={16} />
+          <FluentIcon name="search" size={16} white />
           <span>Search</span>
         </div>
 
         {/* Task View */}
         <TaskbarBtn title="Task View" onClick={() => setTaskViewOpen(v => !v)} width={44}>
-          <FluentIcon name="task_list_square_ltr" size={20} />
+          <FluentIcon name="task_list_square_ltr" size={20} white />
         </TaskbarBtn>
 
         {/* Separator */}
@@ -163,7 +163,7 @@ export function TaskBar() {
           {/* Notification bell */}
           <TaskbarBtn title="Notifications" onClick={() => setNotifOpen(v => !v)} width={40}>
             <div style={{ position: 'relative' }}>
-              <FluentIcon name="alert" size={18} />
+              <FluentIcon name="alert" size={18} white />
               {unreadCount > 0 && (
                 <span style={{
                   position: 'absolute', top: '-6px', right: '-6px',
@@ -181,7 +181,7 @@ export function TaskBar() {
           {/* Volume */}
           <div ref={volRef} style={{ position: 'relative' }}>
             <TaskbarBtn title="Volume" onClick={() => setVolOpen(v => !v)} width={40}>
-              <FluentIcon name={getVolumeIcon()} size={18} />
+              <FluentIcon name={getVolumeIcon()} size={18} white />
             </TaskbarBtn>
             {volOpen && (
               <div style={{
@@ -196,7 +196,7 @@ export function TaskBar() {
                     onClick={() => updateSettings({ muted: !settings.muted })}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff', padding: '4px' }}
                   >
-                    <FluentIcon name={settings.muted ? 'speaker_off' : 'speaker_2'} size={20} />
+                    <FluentIcon name={settings.muted ? 'speaker_off' : 'speaker_2'} size={20} white />
                   </button>
                   <input
                     type="range" min={0} max={100} value={settings.volume}
@@ -211,12 +211,12 @@ export function TaskBar() {
 
           {/* Network */}
           <TaskbarBtn title="Network: Connected" onClick={() => openWindow('settings', 'Settings', 'settings', { section: 'network' })} width={40}>
-            <FluentIcon name="wifi_1" size={18} />
+            <FluentIcon name="wifi_1" size={18} white />
           </TaskbarBtn>
 
           {/* Battery */}
           <TaskbarBtn title="Battery: 100%" width={36}>
-            <FluentIcon name="battery_10" size={18} />
+            <FluentIcon name="battery_10" size={18} white />
           </TaskbarBtn>
 
           {/* Clock */}
@@ -304,7 +304,7 @@ function TaskbarAppBtn({ icon, title, isRunning, isActive, onClick, onContextMen
         transition: 'background 100ms',
       }}
     >
-      <FluentIcon name={icon} size={20} />
+      <FluentIcon name={icon} size={20} white />
       {/* Active/running indicator */}
       {isRunning && (
         <div style={{

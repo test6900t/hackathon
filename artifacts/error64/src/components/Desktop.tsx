@@ -212,7 +212,7 @@ export function Desktop() {
             onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setSelected(new Set([icon.id])); handleContextMenu(e, icon.id); }}
           >
             <div style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <FluentIcon name={icon.icon} size={48} />
+              <FluentIcon name={icon.icon} size={48} white />
             </div>
             {renaming === icon.id ? (
               <input

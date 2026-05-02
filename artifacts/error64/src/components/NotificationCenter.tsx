@@ -57,7 +57,7 @@ export function NotificationCenter() {
       <div style={{ flex: 1, padding: '0 12px', minHeight: 0 }}>
         {notifications.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 20px', opacity: 0.5, fontSize: '13px' }}>
-            <FluentIcon name="alert_off" size={32} />
+            <FluentIcon name="alert_off" size={32} white />
             <div style={{ marginTop: '8px' }}>No notifications</div>
           </div>
         ) : (
@@ -106,13 +106,13 @@ export function NotificationCenter() {
 
         {/* Brightness */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-          <FluentIcon name="brightness_high" size={16} />
+          <FluentIcon name="brightness_high" size={16} white />
           <input type="range" min={0} max={100} defaultValue={100} style={{ flex: 1, accentColor: '#0078D4' }} />
         </div>
 
         {/* Volume */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <FluentIcon name="speaker_2" size={16} />
+          <FluentIcon name="speaker_2" size={16} white />
           <input
             type="range" min={0} max={100}
             value={settings.volume}
@@ -149,7 +149,7 @@ function QuickToggle({ label, icon, active, onClick }: { label: string; icon: st
         transition: 'background 150ms',
       }}
     >
-      <FluentIcon name={icon} size={18} />
+      <FluentIcon name={icon} size={18} white />
       {label}
     </button>
   );

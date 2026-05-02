@@ -124,15 +124,15 @@ export function StartMenu() {
           <svg viewBox="0 0 24 24" fill="#fff" width="22" height="22"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         </div>
 
-        <SideBtn icon="folder_open" label="Documents" onClick={() => launch('explorer', 'File Explorer', 'folder')} />
-        <SideBtn icon="image" label="Pictures" onClick={() => launch('explorer', 'File Explorer', 'folder')} />
-        <SideBtn icon="settings" label="Settings" onClick={() => launch('settings', 'Settings', 'settings')} />
+        <SideBtn icon="folder_open" label="Documents" onClick={() => launch('explorer', 'File Explorer', 'folder')} white />
+        <SideBtn icon="image" label="Pictures" onClick={() => launch('explorer', 'File Explorer', 'folder')} white />
+        <SideBtn icon="settings" label="Settings" onClick={() => launch('settings', 'Settings', 'settings')} white />
 
         <div style={{ flex: 1 }} />
 
         {/* Power button */}
         <div style={{ position: 'relative' }}>
-          <SideBtn icon="power" label="Power" onClick={() => setShowPower(v => !v)} />
+          <SideBtn icon="power" label="Power" onClick={() => setShowPower(v => !v)} white />
           {showPower && (
             <div style={{
               position: 'absolute', left: '52px', bottom: 0,
@@ -154,7 +154,7 @@ export function StartMenu() {
                   onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
-                  <FluentIcon name={item.icon} size={16} />
+                  <FluentIcon name={item.icon} size={16} white />
                   {item.label}
                 </div>
               ))}
@@ -171,7 +171,7 @@ export function StartMenu() {
             display: 'flex', alignItems: 'center', gap: '8px',
             background: 'rgba(255,255,255,0.1)', padding: '6px 10px', borderRadius: '2px',
           }}>
-            <FluentIcon name="search" size={16} />
+            <FluentIcon name="search" size={16} white />
             <input
               ref={inputRef}
               value={query}
@@ -244,7 +244,7 @@ export function StartMenu() {
                     </div>
                   </>
                 ) : (
-                  <FluentIcon name={tile.icon} size={isSmall ? 24 : 32} />
+                  <FluentIcon name={tile.icon} size={isSmall ? 24 : 32} white />
                 )}
                 <div style={{ marginTop: 'auto', fontSize: '11px', opacity: 0.9, fontWeight: 400 }}>
                   {tile.name}
@@ -262,7 +262,7 @@ export function StartMenu() {
   );
 }
 
-function SideBtn({ icon, label, onClick }: { icon: string; label: string; onClick: () => void }) {
+function SideBtn({ icon, label, onClick, white }: { icon: string; label: string; onClick: () => void; white?: boolean }) {
   const [hover, setHover] = useState(false);
   return (
     <button
@@ -278,7 +278,7 @@ function SideBtn({ icon, label, onClick }: { icon: string; label: string; onClic
         transition: 'background 100ms',
       }}
     >
-      <FluentIcon name={icon} size={18} />
+      <FluentIcon name={icon} size={18} white={white} />
     </button>
   );
 }
@@ -297,7 +297,7 @@ function AppListItem({ app, onClick }: { app: { appId: string; name: string; ico
         fontSize: '13px',
       }}
     >
-      <FluentIcon name={app.icon} size={20} />
+      <FluentIcon name={app.icon} size={20} white />
       <span>{app.name}</span>
     </div>
   );
