@@ -1,0 +1,49 @@
+
+
+**AUDIO SYSTEM**
+
+Global volume slider in system tray controls volume of all HTML5 audio/video elements played by Media Player and Camera. Volume icon changes between mute/low/medium/high icons based on level. Mute toggle. Clicking volume icon opens a popup with the slider. Settings Sound page shows the same slider. System sounds: play a short click sound on: app open, app close, notification received, error dialog. Sound files can be short base64-encoded WAV beeps or fetched from a free sound CDN.
+
+---
+
+**CONTEXT MENUS**
+
+All context menus must be styled exactly like Windows 10 — white background (dark in dark mode), thin border, box shadow, items with icons on the left, keyboard shortcut hints on the right, separator lines between groups, submenus with arrow indicators that open on hover, smooth fade-in animation. Context menus close on click outside or Escape. Never overflow outside viewport — auto-reposition if near edges.
+
+---
+
+**WINDOW EFFECTS**
+
+Acrylic/frosted glass effect on Start Menu and Notification Center using backdrop-filter blur. Window minimize/maximize/restore/close animations using CSS transitions. Open animation: window scales from 0.95 to 1 with fade-in. Close animation: scale to 0.95 with fade-out. Maximize animation: smooth expand. Minimize: window flies to taskbar icon position. Drop shadows on all windows. Active window has a slightly more opaque shadow.
+
+---
+
+**ERROR DIALOGS**
+
+All error conditions show Windows-style dialog boxes: icon on left (error/warning/info/question), message text, OK/Cancel/Yes/No buttons as appropriate. Dialogs are modal (block interaction with parent window). Title bar shows app name. Dialogs can be dragged. Example dialogs: "Are you sure you want to delete this file?", "File already exists. Do you want to replace it?", "Do you want to save changes to Untitled?", "Access Denied — this location is read-only", "Out of virtual storage space".
+
+---
+
+**PERFORMANCE REQUIREMENTS**
+
+Zero page reloads — full SPA. requestAnimationFrame for all canvas animations. CSS transitions for all UI animations — never use setTimeout for animations. Debounce search inputs. Virtual DOM diffing or efficient DOM updates for task manager process list. Lazy-initialize apps — don't load all app code until first opened. Web Workers for any heavy computation (file indexing, image processing). IndexedDB for large file storage (images, videos), localStorage for settings and small data. All icons fetched from CDN with fallback to inline SVG if fetch fails. Load Segoe UI font from CDN. The entire OS must feel snappy with no jank.
+
+---
+
+**ICONS**
+
+For every single app and file type icon fetch from: icons8.com/icon/[search], Microsoft Fluent UI icons GitHub raw URLs (github.com/microsoft/fluentui-system-icons), or SVGRepo. Map every app to its real Windows 10 icon. File type icons: .txt, .jpg, .png, .mp3, .mp4, .pdf, .zip, .exe, .folder (open and closed). All icons should be SVG or PNG fetched at runtime with fallback inline SVGs.
+
+---
+
+**EVERYTHING NOT LISTED BUT REAL WINDOWS 10 HAS**
+
+Include every other standard Windows 10 accessory, tool, and feature you know of that has not been explicitly listed above. Think through the full Windows 10 app list and include anything missing: Steps Recorder (captures click sequence and exports a fake MHT log), Windows Fax and Scan placeholder, XPS Viewer placeholder, Internet Explorer placeholder (deprecated notice page), Cortana placeholder (search bar persona mode with fake AI responses using the Claude API), Feedback Hub placeholder, Get Help placeholder, Xbox Game Bar overlay (Windows+G shows a game bar overlay with FPS counter simulation, audio, capture button), Windows Security (fake dashboard with all green checkmarks), Font Viewer (double-click a font file shows character preview), Archive Manager (right-click ZIP creates/extracts in virtual FS), Telnet client in CMD, FTP client in CMD, Windows Subsystem for Linux placeholder (a fake bash prompt in a terminal window), Remote Desktop placeholder, Windows Media Player classic mode, Groove Music placeholder if Media Player is already included, Movies and TV placeholder, Phone Link placeholder, Microsoft Store placeholder with fake app tiles and install simulation, Your Phone placeholder, Mixed Reality Portal placeholder, 3D Viewer placeholder, Quick Assist placeholder.
+
+---
+
+Skip entirely: Registry Editor, actual network driver control, real Wi-Fi scanning, real Bluetooth, actual hardware access beyond webcam/mic getUserMedia, Windows Update real downloads, real antivirus engine, real Active Directory, actual printer drivers.
+
+---
+
+Name this entire OS **Error64** everywhere it appears. Ship it as a single self-contained HTML file.

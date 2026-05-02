@@ -1,0 +1,127 @@
+---
+
+**BOOT SEQUENCE**
+
+On page load show a full black screen with the Error64 logo centered (use Windows 10 style wordmark but replace text with "Error64"), animated spinning dots beneath it exactly like Windows 10 boot. After 3 seconds transition to Lock Screen. On Shut Down from Start Menu animate a "Shutting down..." screen with the Error64 logo then go to full black. On Restart replay the full boot animation then Lock Screen then Desktop.
+
+---
+
+**LOCK SCREEN**
+
+Full screen wallpaper (default a dark moody wallpaper fetched from an online source or base64 embedded). Show current live time in large thin font center screen, date below it. Click anywhere or press any key to slide up and reveal the login screen. Login screen shows a circular user avatar (default avatar from online icon), username "User", and a password input field. Accept any password on pressing Enter. Animate the unlock with a smooth upward slide and fade into the desktop.
+
+---
+
+**DESKTOP**
+
+Pixel-perfect Windows 10 desktop. Draggable desktop icons with real Windows 10 app icons fetched online. Double-click icons to open apps. Right-click desktop opens context menu: New Folder, New Text File, View (Large Icons / Medium Icons / Small Icons), Sort By (Name / Date / Type / Size), Refresh, Display Settings, Personalize. Support rubber-band multi-select by dragging on empty desktop area. Icons snap to invisible grid. Selected icons highlight in blue. F2 renames selected icon. Delete key deletes selected icon (sends to Recycle Bin). Desktop icons include: This PC, Recycle Bin, Error64 Browser, File Explorer, Notepad, Paint, Calculator, Camera, Photos, Calendar, Mail, Media Player, Sticky Notes, Settings, Command Prompt, Control Panel, Task Manager, Snipping Tool, and any other standard Windows utility.
+
+---
+
+**TASKBAR**
+
+Pinned to bottom, always on top of all windows, never overlapped. Left side: Start button (Error64 logo / Windows flag icon), Search bar (click opens Search overlay), Task View button. Center: pinned app icons with real icons fetched online, running app icons with blue active underline indicator. Right side (system tray): live clock ticking every second showing HH:MM AM/PM and date below, volume icon (click opens volume slider popup), Wi-Fi icon (shows "Connected" static), battery icon, notification bell icon (click opens Notification Center), Show Desktop button at far right edge. Hover any taskbar icon to show tooltip with app name. Right-click running app in taskbar: Pin to Taskbar, Close Window. Running apps that are minimized restore on click, running apps that are open minimize on click.
+
+---
+
+**START MENU**
+
+Opens on Windows key or Start button click. Closes on clicking outside. Three-panel layout exactly like Windows 10. Left panel: user avatar (circular, clickable to open Accounts Settings), username "User", shortcuts for Documents, Pictures, Settings, Power (hover shows Sleep / Restart / Shut Down). Middle panel: scrollable alphabetically grouped All Apps list with real app icons, every installed app listed. Right panel: Live Tiles grid — Calendar tile (shows today's date live), Clock tile, Photos tile, Mail tile, Settings tile, Weather tile (show static or fetch from a free weather API using a hardcoded default city), News tile (show 3 static fake headlines). Right-click any tile to resize (Small / Medium / Wide / Large) or unpin. Tiles animate subtly. Search bar at the top of the Start Menu filters All Apps list as you type.
+
+---
+
+**WINDOW MANAGER**
+
+Every app opens in a fully draggable resizable window. Title bar: real app icon on left, app name, minimize button, maximize/restore button, red close button (turns brighter red on hover). Dragging title bar moves the window. Drag resize from any edge or corner. Windows maintain z-index focus stack — clicking any window brings it to front. Active window title bar is slightly brighter than inactive. Snap system: drag window to left edge snaps to left 50%, drag to right edge snaps to right 50%, drag to top maximizes. When snapping to left or right show Snap Assist overlay of other open windows to fill the other half. Minimize animates window shrinking into taskbar icon. Maximize/restore animates. Close fades out. Alt+Tab shows a full Windows 10 style switcher overlay with live window thumbnails. Windows+Left/Right/Up/Down arrow keys control snap and maximize for the focused window. F11 fullscreens the active window. Alt+F4 closes the active window. Multiple instances of the same app can be open simultaneously.
+
+---
+
+**VIRTUAL FILE SYSTEM**
+
+Complete virtual file system stored in localStorage and IndexedDB that persists across page refreshes. Folder tree mirrors Windows 10: C:\Users\User\Desktop, C:\Users\User\Documents, C:\Users\User\Downloads, C:\Users\User\Pictures, C:\Users\User\Music, C:\Users\User\Videos, C:\Users\User\AppData, C:\Recycle Bin, C:\Windows\System32 (read-only fake). Every file stores: name, extension, type, size, created date, modified date, parent folder path, contents (UTF-8 text or base64 for binary). File operations: create, open, rename, delete (moves to Recycle Bin), move (drag and drop between folders), copy and paste. All changes instantly reflect across File Explorer, Desktop, and all open apps. Preload with some sample files: a .txt welcome file, a few sample images (base64 embedded small images), a sample mp3 (or silent placeholder).
+
+---
+
+**FILE EXPLORER**
+
+Full Windows Explorer clone. Left sidebar: Quick Access (Desktop, Downloads, Documents, Pictures, Music, Videos — each a real shortcut to the virtual path), This PC (shows C: drive with a simulated used/free space donut or bar), Network (static), Recycle Bin. Main area: toggleable views — Extra Large Icons, Large Icons, Medium Icons, Small Icons, List, Details (Details shows Name, Date Modified, Type, Size columns that are sortable by clicking column header). Top ribbon with tabs: Home (New Folder, New Item, Cut, Copy, Paste, Rename, Delete, Properties), Share, View (show/hide checkboxes, layout options). Address bar at top shows current path as clickable breadcrumbs and is editable — press Enter to navigate to typed path. Search bar top right filters current directory contents in real time. Back, Forward, Up navigation buttons. Status bar at bottom shows item count and selected item count. Right-click file: Open, Open With (submenu of compatible apps), Cut, Copy, Rename, Delete, Properties. Right-click folder: Open, Open in New Window, Pin to Quick Access, Cut, Copy, Rename, Delete, Properties. Properties window shows: file name, type, location, size, created date, modified date, read-only checkbox. Drag and drop files/folders between locations to move them. Ctrl+drag to copy. Double-click .txt opens Notepad, double-click image opens Photos, double-click .mp3/.mp4 opens Media Player. Multi-select with Ctrl+click and Shift+click. Ctrl+A selects all. Delete key deletes selected items. F2 renames selected item.
+
+---
+
+**NOTEPAD**
+
+Exact Windows 10 Notepad. Menu bar: File (New Ctrl+N, New Window, Open Ctrl+O from virtual FS, Save Ctrl+S, Save As, Page Setup, Print Ctrl+P simulated, Exit), Edit (Undo Ctrl+Z, Redo Ctrl+Y, Cut, Copy, Paste, Delete, Find Ctrl+F, Find Next F3, Replace Ctrl+H, Go To Ctrl+G, Select All Ctrl+A, Time/Date F5 inserts timestamp), Format (Word Wrap toggle, Font — opens font dialog with family/style/size picker), View (Status Bar toggle, Zoom In/Out/Restore). Find bar slides in below text area with search input, match highlighting, previous/next buttons, close button. Replace bar extends Find bar with replace input and Replace/Replace All buttons. Status bar shows Ln X, Col Y. Prompts to save unsaved changes on close. Unlimited undo/redo. Keyboard shortcuts all functional.
+
+---
+
+**PAINT**
+
+Full Microsoft Paint clone. Top: menu bar (File: New, Open from virtual FS, Save PNG Ctrl+S, Save As, Print simulated, Exit) and ribbon toolbar. Ribbon: Tools section (Pencil, Fill with Color, Text, Eraser, Color Picker eyedropper, Magnifier), Brushes section (round, calligraphy, airbrush, oil, crayon — each changes brush style), Shapes section (Line, Curve, Rectangle, Rounded Rectangle, Ellipse, Triangle, Diamond, Pentagon, Hexagon, Arrow, Star), Size slider (stroke width 1–30px), Color palette (30 fixed colors plus Color 1 / Color 2 with custom color picker dialog for hex/rgb/hsv), Edit Colors dialog. Canvas: white by default, mouse draw, right-click draws with Color 2. Text tool: click canvas to place text box, font family/size/bold/italic/underline toolbar appears. Selection tools: rectangular select and free-form select — cut, copy, paste, delete, move, resize selection. Image menu: Flip/Rotate (horizontal, vertical, 90/180/270), Resize/Skew (by percentage or pixels, maintain aspect ratio), Invert Colors, Grayscale. View: Zoom (Ctrl+scroll, + and - buttons, zoom percentage shown), Gridlines toggle, Ruler toggle, Full Screen. Canvas size shown in bottom status bar alongside cursor coordinates. Undo/redo up to 50 steps Ctrl+Z/Ctrl+Y.
+
+---
+
+**PHOTOS APP**
+
+All images from the virtual file system's Pictures folder displayed as a grid of thumbnails. Click image to open viewer. Viewer: full image centered, Previous/Next arrow buttons, filename and date shown, Zoom in/out (scroll wheel and +/- buttons), actual size and fit-to-window toggle, Rotate Left / Rotate Right (saves rotation), Delete button (sends to Recycle Bin), Save a Copy, Share button (downloads file). Edit mode button: opens image on HTML5 Canvas with editing tools — Crop (drag resizable crop box, apply crop), Brightness slider, Contrast slider, Saturation slider, Sharpness slider, Vignette toggle, Filters (Original, Vivid, Cool, Warm, Sepia, Grayscale, Invert, Fade), Undo/Redo for edits, Save/Save As. Slideshow mode auto-advances every 3 seconds with crossfade. Drag and drop image files from the OS file system (real browser drag-and-drop) imports them into Pictures in the virtual FS.
+
+---
+
+**CAMERA APP**
+
+Access device webcam with getUserMedia. Live camera preview fills the window. Take Photo button captures frame using Canvas, saves as .jpg with timestamp filename (Camera_YYYYMMDD_HHMMSS.jpg) to Pictures in virtual FS, shows a flash animation. Toggle front/back camera if device has multiple. Video Recording: Start Recording button uses MediaRecorder API, shows red REC indicator with timer, Stop Recording saves .webm file to Videos in virtual FS. Countdown timer before capture: Off / 3s / 5s / 10s, shows on-screen countdown. Recent captures strip on right shows last 5 thumbnails, click to open in Photos. Camera filters: Normal, Grayscale, Sepia, Mirror (applied via CSS filter on preview, baked into captured image via Canvas). Camera settings panel: grid overlay toggle, capture sound toggle.
+
+---
+
+**CALCULATOR**
+
+Exact Windows 10 Calculator. Hamburger menu top left switches modes: Standard, Scientific, Programmer, Date Calculation. Standard: display shows current input and running expression above it, buttons: 0-9, ., +, -, ×, ÷, =, %, √, x², 1/x, ±, CE, C, Backspace, Memory (MC, MR, M+, M-, MS, M∨). Scientific: all Standard buttons plus sin, cos, tan, sin⁻¹, cos⁻¹, tan⁻¹, log, log₂, ln, eˣ, 10ˣ, x^y, ³√x, ⁿ√x, |x|, exp, mod, π, e, ( ), n!, Deg/Rad/Grad toggle. Programmer: HEX/DEC/OCT/BIN display and toggle, bitwise AND OR XOR NOT, bit shift, QWORD/DWORD/WORD/BYTE selector. Date Calculation: add or subtract days from a date, or difference between two dates. History panel slides out from right showing previous calculations, clickable to recall. Keyboard fully functional for numbers, operators, Enter for equals, Backspace, Escape for clear.
+
+---
+
+**CALENDAR APP**
+
+Month view by default showing current month grid. Navigation arrows for previous/next month. Today button returns to current date. Today's date highlighted in accent blue. Click any date to open event creation popup: event name input, time picker, color selector, description textarea, Save/Cancel. Events appear as colored pills on the date cell. Click existing event to edit or delete. Toggle to Week view (7-column time grid with hourly rows, drag to create events). Toggle to Day view (single day time grid). Toggle to Agenda view (chronological list of upcoming events). Events persist in localStorage. Mini calendar in sidebar for quick navigation. Search events by name.
+
+---
+
+**MAIL APP**
+
+Simulated email client. Left sidebar: folders — Inbox (badge count), Starred, Sent, Drafts, Junk, Trash, plus a + New Folder button. Compose button opens a compose window (To, CC, Subject, rich body with bold/italic/underline/bullet formatting, Attach File from virtual FS, Send). Preload inbox with 10 realistic fake emails from diverse fake senders with subjects, timestamps, and preview text and full body. Click email: shows reading pane on right with full email. Reply button opens compose window pre-filled To and Subject. Forward pre-fills Subject and body. Delete moves to Trash. Star toggles star. Mark Unread/Read toggle. Unread emails bold in list. Search bar filters by sender or subject. Inbox auto-receives a new simulated email every few minutes. Notification when new email arrives (shows in Notification Center).
+
+---
+
+**ERROR64 BROWSER**
+
+In-app web browser. Top bar: Back, Forward, Refresh, Home buttons, address bar (URL input — press Enter or click Go to load), bookmark star button, extensions placeholder, menu button. Load URLs in an iframe. If iframe fails (X-Frame-Options blocked), show a styled error page with the message "Error64 cannot display this page in embedded mode" and an Open in New Tab button that opens real browser tab. New Tab page: shows a search bar, grid of bookmarked sites with favicons, and quick-access tiles for Google, YouTube, GitHub, Wikipedia. Multiple tabs: + button adds tab, × on tab closes it, tab titles update to page title, active tab highlighted. Bookmarks: star saves current URL+title, dropdown panel shows saved bookmarks as clickable list with delete option. History panel in menu: shows visited URLs with timestamps, clickable to navigate back. Downloads panel (simulated list). Keyboard shortcuts: Ctrl+T new tab, Ctrl+W close tab, Ctrl+L focus address bar, Ctrl+R refresh, Alt+Left/Right back/forward.
+
+---
+
+**MEDIA PLAYER**
+
+Opens audio and video files from virtual FS. Also supports dragging real media files into the window. Left panel: Library browser (Music, Videos, Playlists). Playlist panel: list of queued tracks/videos with drag-to-reorder. Main area: for video shows the video player, for audio shows album art (or animated visualizer). Controls bar at bottom: track name and artist, Previous, Play/Pause, Next, Shuffle toggle, Repeat (off/one/all) toggle, seek bar (click and drag scrubber), current time / total time, Volume slider with Mute button, Fullscreen (for video), Mini Mode button (collapses to a compact floating bar). Audio visualizer: canvas-based frequency bar chart using Web Audio API AnalyserNode — reacts in real time to audio. Equalizer panel: 10-band EQ with draggable sliders. Playback speed selector: 0.5x, 0.75x, 1x, 1.25x, 1.5x, 2x. Keyboard: Space for play/pause, Left/Right arrows to seek 10s, Up/Down for volume.
+
+---
+
+**SNIPPING TOOL**
+
+Modes: Rectangular Snip (drag selection box on screen overlay), Window Snip (click a window to capture it), Full Screen Snip. Delay: None / 1s / 3s / 5s before capture. After capture, opens in editor window: annotation tools — Pen (color and size picker), Highlighter (yellow semi-transparent), Eraser, Text tool. Toolbar: Undo Ctrl+Z, Copy to Clipboard, Save (saves PNG to Pictures in virtual FS with timestamp filename), New Snip button. Pin on top toggle keeps Snipping Tool above other windows. Keyboard shortcut: Windows+Shift+S opens the snip mode selector overlay.
+
+---
+
+**STICKY NOTES**
+
+Sticky notes float directly on the desktop layer (not inside window chrome). Colors: yellow, green, pink, purple, blue, gray, charcoal. Each note is a small draggable resizable card. Title bar: colored header with note color options, delete button (×), add new note (+). Body: contenteditable div supporting plain text, bold Ctrl+B, italic Ctrl+I, underline Ctrl+U, strikethrough, bullet list Ctrl+Shift+L. Font size adjustable. Notes persist in localStorage with position, size, color, and content. Double-click a note to expand it. List view button on the notes bar shows all notes in a sidebar for quick navigation. New note auto-positions offset from last note.
+
+---
+
+**COMMAND PROMPT**
+
+Black terminal window, green or white text, monospaced font (Consolas from CDN). Prompt shows C:\Users\User> updating with current virtual directory. Commands: dir (list directory contents with size and date), cd [path] (navigate — supports . .. ~ and absolute paths), mkdir [name], rmdir [name], del [filename], copy [src] [dest], move [src] [dest], ren [old] [new], type [filename] (display text file contents), echo [text], cls (clear screen), color [code] (change text/background color), date (show date), time (show time), title [text] (change window title), ipconfig (show fake IP: 192.168.1.X, gateway, DNS), ping [host] (animated fake ping with ~30ms responses), tracert [host] (simulated hops), systeminfo (fake OS info showing Error64), tasklist (show open apps), taskkill /IM [appname] (closes app window), start [appname] (opens app), ver (show Error64 version), whoami (show User), help (styled table of all commands with descriptions). Command history with Up/Down arrow navigation. Tab completion for file and folder names. Text selection and copy with Ctrl+C when no command running. Scroll history. Right-click title bar of CMD window for Properties (font size, window size, opacity).
+
+---
+
+**CONTROL PANEL**
+
+Classic Control Panel with Category View and All Items View toggle. Large icons for each panel. Include: System (fake specs — Error64 OS, 8GB RAM, Intel Core i5 simulated, 64-bit), Display (links to display settings), Sound (volume slider, output device list), User Accounts (change username, change avatar), Programs and Features (list of all apps with Uninstall button), Network and Sharing Center (static fake network info), Windows Firewall (static), Personalization (links to background and color settings), Keyboard (repeat delay and rate sliders, simulated), Mouse (pointer speed slider, button configuration static), Date and Time (timezone selector, NTP sync simulated), Administrative Tools (links to Task Manager, Event Viewer static), Ease of Access Center (text size, high contrast toggle, narrator toggle simulated), Folder Options (show/hide hidden files toggle for virtual FS, single/double click to open toggle).
+
+---
