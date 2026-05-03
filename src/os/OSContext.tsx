@@ -118,7 +118,7 @@ const DEFAULT_SETTINGS: OSSettings = {
   nightLight: false,
   volume: 75,
   muted: false,
-  wallpaper: 'gradient1',
+  wallpaper: '/wallpapers/7.jpg',
   username: 'User',
   taskbarAutoHide: false,
   showDesktopIcons: true,

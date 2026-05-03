@@ -17,9 +17,20 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    assetsDir: "assets",
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "react-icons"],
+        },
+      },
+    },
   },
   server: {
     port: 5173,
     host: true,
+    middlewareMode: false,
   },
+  publicDir: "public",
 });
