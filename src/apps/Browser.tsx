@@ -30,43 +30,17 @@ interface Tab extends BrowserProfile {
   historyIndex: number;
 }
 
-const MINECRAFT_EMBED_URL = 'https://www.gameflare.com/embed/minecraft-classic/';
-const MINECRAFT_SOURCE_URL = 'https://www.gameflare.com/online-game/minecraft-classic/';
 const READER_PREFIX = 'https://r.jina.ai/';
-const FRAME_HOSTILE_HOSTS = new Set([
-  'github.com',
-  'google.com',
-  'www.google.com',
-  'reddit.com',
-  'www.reddit.com',
-  'x.com',
-  'www.x.com',
-  'twitter.com',
-  'www.twitter.com',
-  'instagram.com',
-  'www.instagram.com',
-  'facebook.com',
-  'www.facebook.com',
-]);
+const RICKROLL_VIDEO_ID = 'dQw4w9WgXcQ';
 
 const BOOKMARKS = [
-  { label: 'Google', url: 'https://www.google.com', icon: 'search' },
-  { label: 'YouTube', url: 'https://www.youtube.com', icon: 'play_circle' },
   { label: 'Wikipedia', url: 'https://en.wikipedia.org', icon: 'book' },
-  { label: 'GitHub', url: 'https://github.com', icon: 'terminal' },
-  { label: 'Reddit', url: 'https://www.reddit.com', icon: 'chat_help' },
-  { label: 'Minecraft Classic', url: 'error64://minecraft', icon: 'cube' },
+  { label: 'YouTube', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', icon: 'play_circle' },
 ];
 
 const SPEED_DIAL = [
-  { label: 'Google', url: 'https://www.google.com', color: '#4285f4', icon: 'search' },
-  { label: 'YouTube', url: 'https://www.youtube.com', color: '#ff0000', icon: 'play_circle' },
   { label: 'Wikipedia', url: 'https://en.wikipedia.org', color: '#636466', icon: 'book' },
-  { label: 'GitHub', url: 'https://github.com', color: '#24292f', icon: 'terminal' },
-  { label: 'Reddit', url: 'https://www.reddit.com', color: '#ff4500', icon: 'chat_help' },
-  { label: 'Minecraft', url: 'error64://minecraft', color: '#5b9b43', icon: 'cube', appIcon: 'minecraft' },
-  { label: 'MDN', url: 'https://developer.mozilla.org', color: '#1976d2', icon: 'book' },
-  { label: 'Stack Overflow', url: 'https://stackoverflow.com', color: '#f58025', icon: 'clipboard_paste' },
+  { label: 'YouTube', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', color: '#ff0000', icon: 'play_circle' },
 ];
 
 function getDomainLabel(url: string) {
@@ -90,15 +64,6 @@ function getReaderUrl(url: string) {
   return `${READER_PREFIX}${url}`;
 }
 
-function shouldPreferReader(url: string) {
-  try {
-    const hostname = new URL(url).hostname.toLowerCase();
-    return FRAME_HOSTILE_HOSTS.has(hostname);
-  } catch {
-    return false;
-  }
-}
-
 function resolveBrowserProfile(raw: string): BrowserProfile {
   const normalized = normalizeInput(raw);
 
@@ -112,47 +77,43 @@ function resolveBrowserProfile(raw: string): BrowserProfile {
     };
   }
 
-  if (normalized === 'error64://minecraft' || normalized.toLowerCase() === 'minecraft') {
-    return {
-      displayUrl: 'error64://minecraft',
-      resolvedUrl: MINECRAFT_EMBED_URL,
-      externalUrl: MINECRAFT_SOURCE_URL,
-      title: 'Minecraft Classic',
-      label: 'Embedded Game',
-      preferredMode: 'live',
-      readerUrl: getReaderUrl(MINECRAFT_SOURCE_URL),
-      compatibilityNote: 'Minecraft loads from a public embed page, so it runs directly inside Error64 Browser.',
-    };
-  }
-
-  const youtubeMatch = normalized.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^?&/]+)/i);
-  if (youtubeMatch?.[1]) {
-    const videoId = youtubeMatch[1];
+  const isWikipedia = normalized.startsWith('https://en.wikipedia.org');
+  if (isWikipedia) {
     return {
       displayUrl: normalized,
-      resolvedUrl: `https://www.youtube.com/embed/${videoId}`,
+      resolvedUrl: normalized,
       externalUrl: normalized,
-      title: 'YouTube Video',
-      label: 'Compatibility Embed',
+      title: 'Wikipedia',
+      label: 'Wikipedia',
       preferredMode: 'live',
       readerUrl: getReaderUrl(normalized),
-      compatibilityNote: 'Watch URLs are converted into the YouTube embed player so they render inside the browser window.',
+      compatibilityNote: 'Wiki mode allows reading wikipedia content.',
     };
   }
 
-  const isSearch = normalized.startsWith('https://duckduckgo.com/?q=');
+  const youtubeMatch = normalized.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^?&/]+)/i);
+  if (youtubeMatch?.[1] || normalized.includes('youtube')) {
+    return {
+      displayUrl: normalized,
+      resolvedUrl: `https://www.youtube-nocookie.com/embed/${RICKROLL_VIDEO_ID}?autoplay=1`,
+      externalUrl: `https://www.youtube.com/watch?v=${RICKROLL_VIDEO_ID}`,
+      title: 'Never Gonna Give You Up',
+      label: 'YouTube',
+      preferredMode: 'live',
+      readerUrl: getReaderUrl(`https://www.youtube.com/watch?v=${RICKROLL_VIDEO_ID}`),
+      compatibilityNote: 'Never gonna let you down.',
+    };
+  }
 
   return {
     displayUrl: normalized,
     resolvedUrl: normalized,
     externalUrl: normalized,
-    title: isSearch ? 'Search Results' : getDomainLabel(normalized),
-    label: isSearch ? 'Embedded Search' : 'Reader Mode',
-    preferredMode: isSearch ? 'live' : 'reader',
+    title: getDomainLabel(normalized),
+    label: 'Live',
+    preferredMode: 'live',
     readerUrl: getReaderUrl(normalized),
-    compatibilityNote: isSearch
-      ? 'Queries are routed to DuckDuckGo because it is typically more iframe-friendly than Google.'
-      : 'Reader mode mirrors the page content through Jina AI Reader so all sites open inside Error64 Browser.',
+    compatibilityNote: 'Loading...',
   };
 }
 
@@ -700,11 +661,11 @@ function NewTabPage({ onNavigate }: { onNavigate: (url: string) => void }) {
         </button>
       </div>
 
-      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '36px' }}>
+<div style={{ fontSize: '12px', color: '#64748b', marginBottom: '36px' }}>
         Sites that block embedding can still open in Reader mode inside the browser window.
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(136px, 1fr))', gap: '14px', width: 'min(760px, 100%)' }}>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(136px, 1fr))', gap: '14px', width: 'min(760px, 100%)' }}>
         {SPEED_DIAL.map((site) => (
           <button
             key={site.url}
@@ -718,14 +679,14 @@ function NewTabPage({ onNavigate }: { onNavigate: (url: string) => void }) {
               padding: '16px 14px',
               borderRadius: '20px',
               border: '1px solid rgba(148,163,184,0.18)',
-              background: 'rgba(255,255,255,0.78)',
+              background: site.color,
               boxShadow: '0 10px 28px rgba(148,163,184,0.12)',
             }}
           >
-            <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: site.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)' }}>
-              {site.appIcon ? <AppIcon iconName={site.appIcon} size={28} /> : <FluentIcon name={site.icon} size={24} color="#ffffff" />}
+            <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.1)' }}>
+              <FluentIcon name={site.icon} size={24} color={site.color} />
             </div>
-            <span style={{ fontSize: '12px', color: '#334155' }}>{site.label}</span>
+            <span style={{ fontSize: '12px', color: '#fff', fontWeight: 600, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{site.label}</span>
           </button>
         ))}
       </div>

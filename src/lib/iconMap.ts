@@ -13,7 +13,7 @@ export const ICON_MAP: Record<string, string> = {
   // Main applications
   'browser': '/ICONS/browser.png',
   'globe': '/ICONS/browser.png',
-  'store_microsoft': '/ICONS/browser.png',
+  'store_microsoft': '/ICONS/microsoft-store.png',
   'notepad': '/ICONS/notepad.png',
   'document': '/ICONS/notepad.png',
   'paint': '/ICONS/icons8-paint-48.png',

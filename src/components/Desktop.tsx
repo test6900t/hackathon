@@ -40,7 +40,7 @@ const INITIAL_ICONS: DesktopIcon[] = [
   { id: 'controlpanel', name: 'Control Panel', appId: 'controlpanel', icon: 'apps_list', x: 2, y: 2 },
   { id: 'cmd', name: 'Command Prompt', appId: 'cmd', icon: 'prompt', x: 2, y: 3 },
   { id: 'snipping', name: 'Snipping Tool', appId: 'snipping', icon: 'screenshot', x: 2, y: 4 },
-  { id: 'sticky', name: 'Sticky Notes', appId: 'sticky', icon: 'note', x: 2, y: 5 },
+  { id: 'sticky', name: 'Sticky Notes', appId: 'sticky', icon: 'sticky_notes', x: 2, y: 5 },
   { id: 'minecraft', name: 'Minecraft', appId: 'minecraft', icon: 'cube', x: 3, y: 0 },
 ];
 
@@ -60,10 +60,11 @@ export function Desktop() {
   const loadDesktopIcons = () => {
     try {
       const s = localStorage.getItem(DESKTOP_ICONS_KEY);
-      return s ? JSON.parse(s) : INITIAL_ICONS;
-    } catch {
-      return INITIAL_ICONS;
-    }
+      const parsed = s ? JSON.parse(s) : null;
+      if (parsed && parsed.length > 0) return parsed;
+    } catch {}
+    localStorage.removeItem(DESKTOP_ICONS_KEY);
+    return INITIAL_ICONS;
   };
 
   const [icons, setIcons] = useState<DesktopIcon[]>(loadDesktopIcons);
@@ -93,15 +94,7 @@ export function Desktop() {
   const saveIcons = useCallback((newIcons: DesktopIcon[]) => {
     setIcons(newIcons);
     localStorage.setItem('error64_desktop_icons', JSON.stringify(newIcons));
-  }, []);
-
-  const handleDblClick = useCallback((icon: DesktopIcon) => {
-    if (icon.appId === 'sticky') {
-      openWindow('sticky', 'Sticky Notes', 'note');
-    } else {
-      openWindow(icon.appId, icon.name, icon.icon);
-    }
-  }, [openWindow]);
+}, []);
 
   const deleteIcons = useCallback((idsToDelete: Set<string>) => {
     setDeletingIcons(idsToDelete);
@@ -132,6 +125,10 @@ export function Desktop() {
   const emptyRecycleBin = useCallback(() => {
     localStorage.setItem('error64_recycle_bin', '[]');
   }, []);
+
+  const handleDblClick = useCallback((icon: DesktopIcon) => {
+    openWindow(icon.appId, icon.name, icon.icon);
+  }, [openWindow]);
 
   const handleIconMouseDown = useCallback((e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -272,14 +269,16 @@ export function Desktop() {
     { label: 'Refresh', onClick: () => window.location.reload() },
     { separator: true },
     { label: 'New Folder', onClick: () => {
+        const newX = Math.max(...icons.map(i => i.x), 0) + 1;
         const name = getUniqueDesktopName('C:\\Users\\User\\Desktop', 'New Folder', '');
         VirtualFS.createFolder('C:\\Users\\User\\Desktop', name);
-        saveIcons([...icons, { id: `folder-${Date.now()}`, name, appId: 'explorer', icon: 'folder', x: 3, y: 0 }]);
+        saveIcons([...icons, { id: `folder-${Date.now()}`, name, appId: 'explorer', icon: 'folder', x: newX, y: 0 }]);
       } },
     { label: 'New Text Document', onClick: () => {
+        const newX = Math.max(...icons.map(i => i.x), 0) + 1;
         const name = getUniqueDesktopName('C:\\Users\\User\\Desktop', 'New Text Document', '.txt');
         VirtualFS.createFile('C:\\Users\\User\\Desktop', name, '');
-        saveIcons([...icons, { id: `txt-${Date.now()}`, name, appId: 'notepad', icon: 'notepad', x: 3, y: 1 }]);
+        saveIcons([...icons, { id: `txt-${Date.now()}`, name, appId: 'notepad', icon: 'notepad', x: newX, y: 1 }]);
       } },
     { 
       label: 'Add App', 

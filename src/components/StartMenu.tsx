@@ -30,7 +30,7 @@ const ALL_APPS = [
   { appId: 'quick-assist', name: 'Quick Assist', icon: 'person_support' },
   { appId: 'settings', name: 'Settings', icon: 'settings' },
   { appId: 'snipping', name: 'Snipping Tool', icon: 'screenshot' },
-  { appId: 'sticky', name: 'Sticky Notes', icon: 'note' },
+  { appId: 'sticky', name: 'Sticky Notes', icon: 'sticky_notes' },
   { appId: 'sysinfo', name: 'System Information', icon: 'desktop_computer' },
   { appId: 'taskmanager', name: 'Task Manager', icon: 'task_list_square_ltr' },
   { appId: 'win-security', name: 'Windows Security', icon: 'shield_checkmark' },

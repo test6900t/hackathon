@@ -27,6 +27,7 @@ const About = lazy(() => import('../apps/About').then(m => ({ default: m.About }
 const MSStore = lazy(() => import('../apps/MSStore').then(m => ({ default: m.MSStore })));
 const Paint3D = lazy(() => import('../apps/Paint3D').then(m => ({ default: m.Paint3D })));
 const Minecraft = lazy(() => import('../apps/Minecraft').then(m => ({ default: m.Minecraft })));
+const StickyNotes = lazy(() => import('../apps/StickyNotes').then(m => ({ default: m.StickyNotesApp })));
 const PlaceholderApp = lazy(() => import('../apps/PlaceholderApp').then(m => ({ default: m.PlaceholderApp })));
 
 function getAppComponent(appId: string, props?: Record<string, unknown>) {
@@ -56,6 +57,7 @@ function getAppComponent(appId: string, props?: Record<string, unknown>) {
     case 'msstore': return <MSStore />;
     case 'paint3d': return <Paint3D />;
     case 'minecraft': return <Minecraft />;
+    case 'sticky': return <StickyNotes />;
     default: return <PlaceholderApp appId={appId} title={props?.title as string || appId} />;
   }
 }
