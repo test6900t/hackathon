@@ -10,6 +10,7 @@ interface FileExplorerProps {
 
 type ViewMode = 'details' | 'large-icons' | 'medium-icons' | 'list';
 type SortKey = 'name' | 'modified' | 'type' | 'size';
+type RibbonTab = 'File' | 'Home' | 'Share' | 'View';
 
 const VIEW_OPTIONS: { mode: ViewMode; label: string; icon: string }[] = [
   { mode: 'details', label: 'Details', icon: 'document_bullet_list' },
@@ -36,6 +37,7 @@ export function FileExplorer({ initialPath = 'C:\\Users\\User' }: FileExplorerPr
   const [addressValue, setAddressValue] = useState(path);
   const [clipboardItems, setClipboardItems] = useState<VFSNode[]>([]);
   const [clipMode, setClipMode] = useState<'copy' | 'cut'>('copy');
+  const [ribbonTab, setRibbonTab] = useState<RibbonTab>('Home');
 
   const loadItems = useCallback(() => {
     const children = VirtualFS.getChildren(path, false);
@@ -222,121 +224,184 @@ export function FileExplorer({ initialPath = 'C:\\Users\\User' }: FileExplorerPr
     new Date(value).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#f5f6f7', color: '#111827' }}>
-      <div style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f3f5f7 100%)', borderBottom: '1px solid #d6dbe3', padding: '8px 10px 10px', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px', flexWrap: 'wrap' }}>
-          <ExplorerActionGroup label="File">
-            <RibbonButton label="New Folder" icon="folder_add" onClick={newFolder} />
-          </ExplorerActionGroup>
-
-          <ExplorerActionGroup label="Clipboard">
-            <RibbonButton label="Cut" icon="cut" onClick={cut} />
-            <RibbonButton label="Copy" icon="copy" onClick={copy} />
-            <RibbonButton label="Paste" icon="clipboard_paste" onClick={paste} disabled={clipboardItems.length === 0} />
-          </ExplorerActionGroup>
-
-          <ExplorerActionGroup label="Organize">
-            <RibbonButton
-              label="Rename"
-              icon="rename"
-              onClick={() => {
-                const target = sorted.find((item) => selected.has(item.path));
-                if (target) {
-                  setRenaming(target.path);
-                  setRenameValue(target.name);
-                }
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#ffffff', color: '#111827' }}>
+      <div style={{ borderBottom: '1px solid #d0d6de', background: 'linear-gradient(180deg, #f7f7f7 0%, #f0f0f0 100%)', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', padding: '0 12px', minHeight: '31px', borderBottom: '1px solid #dadada' }}>
+          {(['File', 'Home', 'Share', 'View'] as RibbonTab[]).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setRibbonTab(tab)}
+              style={{
+                border: 'none',
+                background: ribbonTab === tab ? '#ffffff' : 'transparent',
+                borderTop: ribbonTab === tab ? '2px solid #0078d7' : '2px solid transparent',
+                borderLeft: ribbonTab === tab ? '1px solid #d0d0d0' : '1px solid transparent',
+                borderRight: ribbonTab === tab ? '1px solid #d0d0d0' : '1px solid transparent',
+                borderBottom: ribbonTab === tab ? '1px solid #ffffff' : '1px solid transparent',
+                cursor: 'pointer',
+                fontSize: '12px',
+                color: '#202020',
+                padding: '7px 14px 6px',
+                marginBottom: '-1px',
               }}
-              disabled={selected.size !== 1}
-            />
-            <RibbonButton label="Delete" icon="delete" onClick={deleteSelected} disabled={selected.size === 0} />
-          </ExplorerActionGroup>
-
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-            {VIEW_OPTIONS.map((option) => (
-              <button
-                key={option.mode}
-                onClick={() => setView(option.mode)}
-                title={option.label}
-                style={{
-                  ...smallIconButton,
-                  background: view === option.mode ? '#dbeafe' : '#ffffff',
-                  borderColor: view === option.mode ? '#93c5fd' : '#d6dbe3',
-                }}
-              >
-                <FluentIcon name={option.icon} size={16} color={view === option.mode ? '#2563eb' : '#475569'} />
-              </button>
-            ))}
-          </div>
+            >
+              {tab}
+            </button>
+          ))}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button onClick={goBack} disabled={histIdx === 0} title="Back" style={{ ...smallIconButton, opacity: histIdx === 0 ? 0.4 : 1 }}>
-            <FluentIcon name="arrow_left" size={16} color="#334155" />
-          </button>
-          <button onClick={goForward} disabled={histIdx >= history.length - 1} title="Forward" style={{ ...smallIconButton, opacity: histIdx >= history.length - 1 ? 0.4 : 1 }}>
-            <FluentIcon name="arrow_right" size={16} color="#334155" />
-          </button>
-          <button onClick={goUp} title="Up" style={smallIconButton}>
-            <FluentIcon name="arrow_up" size={16} color="#334155" />
-          </button>
-          <button onClick={loadItems} title="Refresh" style={smallIconButton}>
-            <FluentIcon name="refresh" size={16} color="#334155" />
-          </button>
+        <div style={{ display: 'flex', alignItems: 'stretch', gap: '14px', padding: '8px 12px 10px', minHeight: '92px' }}>
+          {ribbonTab === 'Home' && (
+            <>
+              <ExplorerActionGroup label="Clipboard">
+                <RibbonButton label="Paste" icon="clipboard_paste" onClick={paste} large disabled={clipboardItems.length === 0} />
+                <RibbonButton label="Cut" icon="cut" onClick={cut} />
+                <RibbonButton label="Copy" icon="copy" onClick={copy} />
+              </ExplorerActionGroup>
+
+              <ExplorerActionGroup label="Organize">
+                <RibbonButton label="New folder" icon="folder_add" onClick={newFolder} />
+                <RibbonButton
+                  label="Rename"
+                  icon="rename"
+                  onClick={() => {
+                    const target = sorted.find((item) => selected.has(item.path));
+                    if (target) {
+                      setRenaming(target.path);
+                      setRenameValue(target.name);
+                    }
+                  }}
+                  disabled={selected.size !== 1}
+                />
+                <RibbonButton label="Delete" icon="delete" onClick={deleteSelected} disabled={selected.size === 0} />
+              </ExplorerActionGroup>
+
+              <ExplorerActionGroup label="Open">
+                <RibbonButton
+                  label="Open"
+                  icon="folder_open"
+                  onClick={() => {
+                    const target = sorted.find((item) => selected.has(item.path));
+                    if (target) openItem(target);
+                  }}
+                  disabled={selected.size !== 1}
+                />
+                <RibbonButton label="Properties" icon="info" onClick={() => {}} />
+              </ExplorerActionGroup>
+            </>
+          )}
+
+          {ribbonTab === 'Share' && (
+            <>
+              <ExplorerActionGroup label="Send">
+                <RibbonButton label="E-mail" icon="mail" onClick={() => openWindow('mail', 'Mail', 'mail')} />
+                <RibbonButton label="Copy path" icon="copy" onClick={() => navigator.clipboard?.writeText(path)} />
+              </ExplorerActionGroup>
+              <ExplorerActionGroup label="Archive">
+                <RibbonButton label="Zip" icon="folder" onClick={() => {}} />
+              </ExplorerActionGroup>
+            </>
+          )}
+
+          {ribbonTab === 'View' && (
+            <>
+              <ExplorerActionGroup label="Layout">
+                {VIEW_OPTIONS.map((option) => (
+                  <RibbonButton key={option.mode} label={option.label} icon={option.icon} onClick={() => setView(option.mode)} active={view === option.mode} />
+                ))}
+              </ExplorerActionGroup>
+              <ExplorerActionGroup label="Sort">
+                <RibbonButton label="Name" icon="text_font" onClick={() => handleSort('name')} active={sortKey === 'name'} />
+                <RibbonButton label="Date" icon="clock" onClick={() => handleSort('modified')} active={sortKey === 'modified'} />
+                <RibbonButton label="Type" icon="document" onClick={() => handleSort('type')} active={sortKey === 'type'} />
+              </ExplorerActionGroup>
+            </>
+          )}
+
+          {ribbonTab === 'File' && (
+            <>
+              <ExplorerActionGroup label="Window">
+                <RibbonButton label="Open new window" icon="folder_open" onClick={() => openWindow('explorer', 'File Explorer', 'folder', { path })} large />
+              </ExplorerActionGroup>
+              <ExplorerActionGroup label="File">
+                <RibbonButton label="Close" icon="close" onClick={() => {}} />
+              </ExplorerActionGroup>
+            </>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 12px 10px' }}>
+          <div style={{ display: 'flex', gap: '1px', alignItems: 'center' }}>
+            <button onClick={goBack} disabled={histIdx === 0} title="Back" style={{ ...smallIconButton, opacity: histIdx === 0 ? 0.45 : 1 }}>
+              <FluentIcon name="arrow_left" size={15} color="#334155" />
+            </button>
+            <button onClick={goForward} disabled={histIdx >= history.length - 1} title="Forward" style={{ ...smallIconButton, opacity: histIdx >= history.length - 1 ? 0.45 : 1 }}>
+              <FluentIcon name="arrow_right" size={15} color="#334155" />
+            </button>
+            <button onClick={goUp} title="Up" style={smallIconButton}>
+              <FluentIcon name="arrow_up" size={15} color="#334155" />
+            </button>
+            <button onClick={loadItems} title="Refresh" style={smallIconButton}>
+              <FluentIcon name="refresh" size={15} color="#334155" />
+            </button>
+          </div>
 
           {addressEdit ? (
             <input
               autoFocus
               value={addressValue}
-              onChange={(e) => setAddressValue(e.target.value)}
+              onChange={(event) => setAddressValue(event.target.value)}
               onBlur={() => {
                 navigate(addressValue);
                 setAddressEdit(false);
               }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
                   navigate(addressValue);
                   setAddressEdit(false);
                 }
-                if (e.key === 'Escape') {
+                if (event.key === 'Escape') {
                   setAddressEdit(false);
                   setAddressValue(path);
                 }
               }}
-              style={{ flex: 1, minHeight: '36px', border: '1px solid #93c5fd', outline: 'none', padding: '0 10px', fontSize: '13px', borderRadius: '8px', background: '#ffffff' }}
+              style={{ flex: 1, minHeight: '32px', border: '1px solid #5b9dd9', outline: 'none', padding: '0 10px', fontSize: '12px', background: '#ffffff' }}
             />
           ) : (
             <button
               onClick={() => setAddressEdit(true)}
               style={{
                 flex: 1,
-                minHeight: '36px',
+                minHeight: '32px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                padding: '0 10px',
-                border: '1px solid #cbd5e1',
-                borderRadius: '8px',
+                padding: '0 8px',
+                border: '1px solid #c5cbd3',
                 background: '#ffffff',
                 cursor: 'text',
                 overflow: 'hidden',
               }}
             >
-              <FluentIcon name="folder" size={15} color="#2563eb" />
-              {breadcrumbs.map((crumb, index) => (
+              <FluentIcon name="folder" size={15} color="#f59e0b" />
+              <span
+                onClick={(event) => {
+                  event.stopPropagation();
+                  navigate('C:');
+                }}
+                style={crumbStyle}
+              >
+                This PC
+              </span>
+              {breadcrumbs.map((crumb) => (
                 <span key={crumb.path} style={{ display: 'flex', alignItems: 'center', gap: '4px', minWidth: 0 }}>
-                  {index > 0 && <FluentIcon name="chevron_right" size={14} color="#94a3b8" />}
+                  <FluentIcon name="chevron_right" size={13} color="#94a3b8" />
                   <span
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={(event) => {
+                      event.stopPropagation();
                       navigate(crumb.path);
                     }}
-                    style={{
-                      whiteSpace: 'nowrap',
-                      color: '#0f172a',
-                      fontSize: '13px',
-                      padding: '2px 4px',
-                      borderRadius: '4px',
-                    }}
+                    style={crumbStyle}
                   >
                     {crumb.label}
                   </span>
@@ -345,26 +410,26 @@ export function FileExplorer({ initialPath = 'C:\\Users\\User' }: FileExplorerPr
             </button>
           )}
 
-          <div style={{ width: '250px', minWidth: '180px', display: 'flex', alignItems: 'center', gap: '8px', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0 10px', minHeight: '36px' }}>
-            <FluentIcon name="search" size={15} color="#64748b" />
+          <div style={{ width: '250px', minWidth: '180px', display: 'flex', alignItems: 'center', gap: '8px', background: '#ffffff', border: '1px solid #c5cbd3', padding: '0 10px', minHeight: '32px' }}>
+            <FluentIcon name="search" size={14} color="#64748b" />
             <input
               placeholder="Search current folder"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '13px' }}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '12px' }}
             />
           </div>
         </div>
       </div>
 
       <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-        <div style={{ width: '220px', borderRight: '1px solid #d6dbe3', background: '#fafbfc', overflowY: 'auto', flexShrink: 0, padding: '10px 0' }}>
+        <div style={{ width: '230px', borderRight: '1px solid #d6dbe3', background: '#f5f6f8', overflowY: 'auto', flexShrink: 0, padding: '10px 0 14px' }}>
           <SidebarSection title="Quick access">
             {quickAccess.map((entry) => (
               <SidebarItem key={entry.path} label={entry.name} icon={entry.icon} active={path === entry.path} onClick={() => navigate(entry.path)} />
             ))}
           </SidebarSection>
-          <SidebarSection title="Locations">
+          <SidebarSection title="Devices and drives">
             {systemLocations.map((entry) => (
               <SidebarItem key={entry.path} label={entry.name} icon={entry.icon} active={path === entry.path} disabled={entry.disabled} onClick={() => !entry.disabled && navigate(entry.path)} />
             ))}
@@ -372,20 +437,20 @@ export function FileExplorer({ initialPath = 'C:\\Users\\User' }: FileExplorerPr
         </div>
 
         <div
-          style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}
+          style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, background: '#ffffff' }}
           onClick={() => setSelected(new Set())}
-          onContextMenu={(e) => {
-            e.preventDefault();
-            setCtxMenu({ x: e.clientX, y: e.clientY });
+          onContextMenu={(event) => {
+            event.preventDefault();
+            setCtxMenu({ x: event.clientX, y: event.clientY });
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid #e2e8f0', background: '#ffffff', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 10px', borderBottom: '1px solid #e5e7eb', background: '#ffffff', flexShrink: 0 }}>
             <div>
-              <div style={{ fontSize: '16px', fontWeight: 600 }}>{breadcrumbs[breadcrumbs.length - 1]?.label || 'This PC'}</div>
-              <div style={{ fontSize: '12px', color: '#64748b' }}>{sorted.length} item{sorted.length === 1 ? '' : 's'} in this folder</div>
+              <div style={{ fontSize: '20px', fontWeight: 300, color: '#111827' }}>{breadcrumbs[breadcrumbs.length - 1]?.label || 'This PC'}</div>
+              <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '3px' }}>{sorted.length} item{sorted.length === 1 ? '' : 's'}</div>
             </div>
             {selected.size > 0 && (
-              <div style={{ fontSize: '12px', color: '#2563eb', background: '#eff6ff', border: '1px solid #bfdbfe', padding: '6px 10px', borderRadius: '999px' }}>
+              <div style={{ fontSize: '12px', color: '#1d4ed8', background: '#eff6ff', border: '1px solid #bfdbfe', padding: '5px 10px' }}>
                 {selected.size} selected
               </div>
             )}
@@ -393,9 +458,9 @@ export function FileExplorer({ initialPath = 'C:\\Users\\User' }: FileExplorerPr
 
           <div style={{ flex: 1, overflow: 'auto', background: '#ffffff' }}>
             {view === 'details' ? (
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
                 <thead>
-                  <tr style={{ background: '#f8fafc', position: 'sticky', top: 0, zIndex: 1 }}>
+                  <tr style={{ background: '#f5f7fa', position: 'sticky', top: 0, zIndex: 1 }}>
                     {([
                       { key: 'name', label: 'Name', width: '48%' },
                       { key: 'modified', label: 'Date modified', width: '24%' },
@@ -405,13 +470,11 @@ export function FileExplorer({ initialPath = 'C:\\Users\\User' }: FileExplorerPr
                       <th
                         key={column.key}
                         onClick={() => handleSort(column.key)}
-                        style={{ padding: '9px 12px', textAlign: 'left', cursor: 'pointer', fontWeight: 600, borderBottom: '1px solid #dbe3ee', color: '#334155', width: column.width }}
+                        style={{ padding: '7px 12px', textAlign: 'left', cursor: 'pointer', fontWeight: 400, borderBottom: '1px solid #dde3ea', color: '#475569', width: column.width }}
                       >
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                           {column.label}
-                          {sortKey === column.key && (
-                            <FluentIcon name={sortAsc ? 'chevron_up' : 'chevron_down'} size={14} color="#2563eb" />
-                          )}
+                          {sortKey === column.key && <FluentIcon name={sortAsc ? 'chevron_up' : 'chevron_down'} size={13} color="#2563eb" />}
                         </span>
                       </th>
                     ))}
@@ -420,19 +483,20 @@ export function FileExplorer({ initialPath = 'C:\\Users\\User' }: FileExplorerPr
                 <tbody>
                   {sorted.map((item) => {
                     const isSelected = selected.has(item.path);
+
                     return (
                       <tr
                         key={item.path}
-                        style={{ background: isSelected ? '#dbeafe' : 'transparent', cursor: 'default' }}
-                        onMouseEnter={(e) => {
-                          if (!isSelected) e.currentTarget.style.background = '#f8fafc';
+                        style={{ background: isSelected ? '#cce8ff' : 'transparent', cursor: 'default' }}
+                        onMouseEnter={(event) => {
+                          if (!isSelected) event.currentTarget.style.background = '#f3f9ff';
                         }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = isSelected ? '#dbeafe' : 'transparent';
+                        onMouseLeave={(event) => {
+                          event.currentTarget.style.background = isSelected ? '#cce8ff' : 'transparent';
                         }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (e.ctrlKey) {
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          if (event.ctrlKey) {
                             const next = new Set(selected);
                             if (next.has(item.path)) next.delete(item.path);
                             else next.add(item.path);
@@ -442,70 +506,71 @@ export function FileExplorer({ initialPath = 'C:\\Users\\User' }: FileExplorerPr
                           }
                         }}
                         onDoubleClick={() => openItem(item)}
-                        onContextMenu={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
+                        onContextMenu={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
                           setSelected(new Set([item.path]));
-                          setCtxMenu({ x: e.clientX, y: e.clientY, item });
+                          setCtxMenu({ x: event.clientX, y: event.clientY, item });
                         }}
                       >
-                        <td style={{ padding: '8px 12px', borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '7px 12px', borderBottom: '1px solid #f1f3f6' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
                             <FluentIcon name={getItemIcon(item)} size={18} color={item.type === 'folder' ? '#eab308' : '#2563eb'} />
                             {renaming === item.path ? (
                               <input
                                 autoFocus
                                 value={renameValue}
-                                onChange={(e) => setRenameValue(e.target.value)}
+                                onChange={(event) => setRenameValue(event.target.value)}
                                 onBlur={() => {
                                   if (renameValue.trim() && renameValue.trim() !== item.name) VirtualFS.rename(item.path, renameValue.trim());
                                   loadItems();
                                   setRenaming(null);
                                 }}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
+                                onKeyDown={(event) => {
+                                  if (event.key === 'Enter') {
                                     if (renameValue.trim()) VirtualFS.rename(item.path, renameValue.trim());
                                     loadItems();
                                     setRenaming(null);
                                   }
-                                  if (e.key === 'Escape') setRenaming(null);
-                                  e.stopPropagation();
+                                  if (event.key === 'Escape') setRenaming(null);
+                                  event.stopPropagation();
                                 }}
-                                onClick={(e) => e.stopPropagation()}
-                                style={{ border: '1px solid #93c5fd', outline: 'none', padding: '2px 6px', fontSize: '13px', borderRadius: '6px', width: '220px' }}
+                                onClick={(event) => event.stopPropagation()}
+                                style={{ border: '1px solid #5b9dd9', outline: 'none', padding: '2px 6px', fontSize: '12px', width: '220px' }}
                               />
                             ) : (
                               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</span>
                             )}
                           </div>
                         </td>
-                        <td style={{ padding: '8px 12px', color: '#475569', borderBottom: '1px solid #f1f5f9' }}>{fmtDate(item.modified)}</td>
-                        <td style={{ padding: '8px 12px', color: '#475569', borderBottom: '1px solid #f1f5f9' }}>{item.type === 'folder' ? 'File folder' : `${item.extension?.toUpperCase() || ''} File`}</td>
-                        <td style={{ padding: '8px 12px', color: '#475569', borderBottom: '1px solid #f1f5f9' }}>{fmtSize(item.size)}</td>
+                        <td style={{ padding: '7px 12px', color: '#475569', borderBottom: '1px solid #f1f3f6' }}>{fmtDate(item.modified)}</td>
+                        <td style={{ padding: '7px 12px', color: '#475569', borderBottom: '1px solid #f1f3f6' }}>{item.type === 'folder' ? 'File folder' : `${item.extension?.toUpperCase() || ''} File`}</td>
+                        <td style={{ padding: '7px 12px', color: '#475569', borderBottom: '1px solid #f1f3f6' }}>{fmtSize(item.size)}</td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
             ) : (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '12px' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', padding: '14px' }}>
                 {sorted.map((item) => {
                   const iconSize = view === 'large-icons' ? 40 : 28;
                   const isSelected = selected.has(item.path);
-                  const cardWidth = view === 'large-icons' ? 118 : view === 'list' ? 210 : 104;
+                  const cardWidth = view === 'large-icons' ? 122 : view === 'list' ? 240 : 104;
+
                   return (
                     <div
                       key={item.path}
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={(event) => {
+                        event.stopPropagation();
                         setSelected(new Set([item.path]));
                       }}
                       onDoubleClick={() => openItem(item)}
-                      onContextMenu={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
+                      onContextMenu={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
                         setSelected(new Set([item.path]));
-                        setCtxMenu({ x: e.clientX, y: e.clientY, item });
+                        setCtxMenu({ x: event.clientX, y: event.clientY, item });
                       }}
                       style={{
                         width: cardWidth,
@@ -516,10 +581,10 @@ export function FileExplorer({ initialPath = 'C:\\Users\\User' }: FileExplorerPr
                         justifyContent: view === 'list' ? 'flex-start' : 'center',
                         gap: '8px',
                         padding: '10px',
-                        borderRadius: '10px',
                         cursor: 'default',
                         textAlign: view === 'list' ? 'left' : 'center',
-                        background: isSelected ? '#dbeafe' : 'transparent',
+                        background: isSelected ? '#cce8ff' : 'transparent',
+                        outline: isSelected ? '1px solid #7bb7f0' : '1px solid transparent',
                       }}
                     >
                       <FluentIcon name={getItemIcon(item)} size={iconSize} color={item.type === 'folder' ? '#d97706' : '#2563eb'} />
@@ -543,7 +608,7 @@ export function FileExplorer({ initialPath = 'C:\\Users\\User' }: FileExplorerPr
         </div>
       </div>
 
-      <div style={{ height: '28px', background: '#f8fafc', borderTop: '1px solid #dbe3ee', display: 'flex', alignItems: 'center', padding: '0 12px', gap: '14px', fontSize: '12px', color: '#475569', flexShrink: 0 }}>
+      <div style={{ height: '24px', background: '#f3f3f3', borderTop: '1px solid #d0d6de', display: 'flex', alignItems: 'center', padding: '0 12px', gap: '14px', fontSize: '11px', color: '#475569', flexShrink: 0 }}>
         <span>{sorted.length} item{sorted.length === 1 ? '' : 's'}</span>
         {selected.size > 0 && <span>{selected.size} selected</span>}
         <span style={{ marginLeft: 'auto' }}>{path}</span>
@@ -563,35 +628,35 @@ export function FileExplorer({ initialPath = 'C:\\Users\\User' }: FileExplorerPr
 
 function ExplorerActionGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', paddingRight: '12px', borderRight: '1px solid #dbe3ee' }}>
+    <div style={{ display: 'flex', alignItems: 'stretch', gap: '8px', paddingRight: '14px', borderRight: '1px solid #d9dde2' }}>
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>{children}</div>
-      <div style={{ fontSize: '11px', color: '#64748b' }}>{label}</div>
+      <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontSize: '11px', color: '#6b7280', letterSpacing: '0.03em' }}>{label}</div>
     </div>
   );
 }
 
-function RibbonButton({ label, icon, onClick, disabled }: { label: string; icon: string; onClick: () => void; disabled?: boolean }) {
+function RibbonButton({ label, icon, onClick, disabled, active, large }: { label: string; icon: string; onClick: () => void; disabled?: boolean; active?: boolean; large?: boolean }) {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
       style={{
-        minWidth: '84px',
-        minHeight: '58px',
-        borderRadius: '10px',
-        border: '1px solid #d6dbe3',
-        background: disabled ? '#f8fafc' : '#ffffff',
-        color: disabled ? '#94a3b8' : '#1e293b',
+        minWidth: large ? '76px' : '62px',
+        minHeight: large ? '68px' : '54px',
+        border: `1px solid ${active ? '#7bb7f0' : '#d6dbe3'}`,
+        background: disabled ? '#fafafa' : active ? '#eaf4ff' : '#ffffff',
+        color: disabled ? '#9ca3af' : '#1e293b',
         cursor: disabled ? 'default' : 'pointer',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         gap: '6px',
-        fontSize: '12px',
+        fontSize: '11px',
+        padding: '6px 8px',
       }}
     >
-      <FluentIcon name={icon} size={18} color={disabled ? '#94a3b8' : '#2563eb'} />
+      <FluentIcon name={icon} size={large ? 22 : 18} color={disabled ? '#9ca3af' : active ? '#1d4ed8' : '#2563eb'} />
       <span>{label}</span>
     </button>
   );
@@ -599,10 +664,8 @@ function RibbonButton({ label, icon, onClick, disabled }: { label: string; icon:
 
 function SidebarSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: '10px' }}>
-      <div style={{ padding: '6px 16px', fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-        {title}
-      </div>
+    <div style={{ marginBottom: '12px' }}>
+      <div style={{ padding: '6px 14px', fontSize: '11px', fontWeight: 600, color: '#6b7280' }}>{title}</div>
       {children}
     </div>
   );
@@ -610,6 +673,7 @@ function SidebarSection({ title, children }: { title: string; children: React.Re
 
 function SidebarItem({ label, icon, active, onClick, disabled }: { label: string; icon: string; active?: boolean; onClick: () => void; disabled?: boolean }) {
   const [hover, setHover] = useState(false);
+
   return (
     <button
       onClick={onClick}
@@ -621,12 +685,13 @@ function SidebarItem({ label, icon, active, onClick, disabled }: { label: string
         display: 'flex',
         alignItems: 'center',
         gap: '10px',
-        padding: '9px 16px',
+        padding: '7px 14px',
         border: 'none',
-        background: active ? '#dbeafe' : hover && !disabled ? '#f1f5f9' : 'transparent',
+        borderLeft: active ? '3px solid #0078d7' : '3px solid transparent',
+        background: active ? '#dbeefe' : hover && !disabled ? '#ebf3fb' : 'transparent',
         color: disabled ? '#94a3b8' : '#1e293b',
         cursor: disabled ? 'default' : 'pointer',
-        fontSize: '13px',
+        fontSize: '12px',
         textAlign: 'left',
       }}
     >
@@ -636,11 +701,18 @@ function SidebarItem({ label, icon, active, onClick, disabled }: { label: string
   );
 }
 
+const crumbStyle: React.CSSProperties = {
+  whiteSpace: 'nowrap',
+  color: '#111827',
+  fontSize: '12px',
+  padding: '2px 4px',
+  border: '1px solid transparent',
+};
+
 const smallIconButton: React.CSSProperties = {
-  width: '36px',
-  height: '36px',
-  borderRadius: '9px',
-  border: '1px solid #d6dbe3',
+  width: '32px',
+  height: '32px',
+  border: '1px solid #c5cbd3',
   background: '#ffffff',
   cursor: 'pointer',
   display: 'flex',

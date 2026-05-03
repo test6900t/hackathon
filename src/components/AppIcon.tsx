@@ -14,17 +14,15 @@ export function AppIcon({ iconName, size = 32, alt, className }: AppIconProps) {
       alt={alt || iconName}
       width={size}
       height={size}
+      loading="eager"
+      decoding="sync"
       style={{
         objectFit: 'contain',
         flexShrink: 0,
-        imageRendering: 'crisp-edges',
+        imageRendering: 'auto',
       }}
       className={className}
       draggable={false}
-      onError={(e) => {
-        // Fallback if image fails to load
-        (e.target as HTMLImageElement).src = '/ICONS/this_pc.png';
-      }}
     />
   );
 }

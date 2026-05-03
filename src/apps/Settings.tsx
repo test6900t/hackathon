@@ -16,6 +16,17 @@ const WALLPAPERS = [
 
 const ACCENT_COLORS = ['#0078D4','#107C10','#D13438','#8764B8','#008575','#C239B3','#00B7C3','#486860','#E74856','#E3008C','#4C4A48','#7A7574'];
 
+const THEMES = [
+  { id: 'default', name: 'Windows 10', accentColor: '#0078D4', darkMode: false },
+  { id: 'dark', name: 'Dark', accentColor: '#0078D4', darkMode: true },
+  { id: 'ocean', name: 'Ocean Blue', accentColor: '#00B7C3', darkMode: false },
+  { id: 'nature', name: 'Nature', accentColor: '#107C10', darkMode: false },
+  { id: 'sunset', name: 'Sunset', accentColor: '#E74856', darkMode: false },
+  { id: 'royal', name: 'Royal Purple', accentColor: '#8764B8', darkMode: false },
+  { id: 'midnight', name: 'Midnight', accentColor: '#C239B3', darkMode: true },
+  { id: 'rose', name: 'Rose Gold', accentColor: '#E3008C', darkMode: false },
+];
+
 const SECTIONS = [
   { id: 'system', label: 'System', icon: 'laptop' },
   { id: 'devices', label: 'Devices', icon: 'bluetooth' },
@@ -86,7 +97,7 @@ export function Settings({ initialSection = 'system' }: SettingsProps) {
                 {[
                   ['Device name', 'Error64-PC'],
                   ['Processor', 'Intel Core i5-10400'],
-                  ['RAM', '8.00 GB'],
+                  ['RAM', '677.00 GB'],
                   ['Device ID', '2024-ERR64-XXXX'],
                   ['Product ID', '00330-80000-00000-AA664'],
                   ['System type', '64-bit OS, x64-based processor'],
@@ -123,6 +134,25 @@ export function Settings({ initialSection = 'system' }: SettingsProps) {
             </Subsection>
 
             <Subsection title="Colors">
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ fontWeight: 600, marginBottom: '8px' }}>Theme Presets</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+                  {THEMES.map(t => (
+                    <div key={t.id} onClick={() => updateSettings({ accentColor: t.accentColor, darkMode: t.darkMode })}
+                      style={{
+                        padding: '8px 12px', background: t.darkMode ? '#1a1a1a' : '#f5f5f5', 
+                        border: `2px solid ${settings.accentColor === t.accentColor && settings.darkMode === t.darkMode ? t.accentColor : '#ddd'}`,
+                        borderRadius: '4px', cursor: 'pointer', textAlign: 'center',
+                      }}>
+                      <div style={{ 
+                        width: '24px', height: '24px', background: t.accentColor, borderRadius: '50%', 
+                        margin: '0 auto 4px' 
+                      }} />
+                      <div style={{ fontSize: '11px', color: t.darkMode ? '#fff' : '#333' }}>{t.name}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <SettingRow label="Dark Mode" sub="Use dark color theme">
                 <Toggle value={settings.darkMode} onChange={v => updateSettings({ darkMode: v })} />
               </SettingRow>
@@ -192,7 +222,10 @@ export function Settings({ initialSection = 'system' }: SettingsProps) {
               {['Error64-Network','Neighbor_5G','XFINITY_AUTO','DIRECT-TV_2G'].map(n => (
                 <div key={n} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #eee', fontSize: '13px' }}>
                   <span>{n}</span>
-                  <span style={{ color: '#666' }}>{n === 'Error64-Network' ? '🔒 Connected' : '🔒'}</span>
+                  <span style={{ color: '#666', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <FluentIcon name="lock" size={12} color="#666" />
+                    {n === 'Error64-Network' ? 'Connected' : ''}
+                  </span>
                 </div>
               ))}
             </Subsection>
@@ -263,6 +296,7 @@ export function Settings({ initialSection = 'system' }: SettingsProps) {
                 <select style={{ border: '1px solid #ddd', padding: '4px 8px', fontSize: '13px' }}>
                   <option>United States</option>
                   <option>United Kingdom</option>
+                  <option>India</option>
                   <option>Canada</option>
                   <option>Australia</option>
                 </select>
@@ -316,7 +350,7 @@ export function Settings({ initialSection = 'system' }: SettingsProps) {
               )}
               {updateState === 'done' && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#107C10' }}>
-                  <span style={{ fontSize: '24px' }}>✓</span>
+                  <FluentIcon name="check_circle" size={24} color="#107C10" />
                   <div>
                     <div style={{ fontWeight: 600 }}>You're up to date</div>
                     <div style={{ fontSize: '13px' }}>Error64 21H2 (Build 19044.1288)</div>
@@ -331,7 +365,10 @@ export function Settings({ initialSection = 'system' }: SettingsProps) {
             </Subsection>
             <Subsection title="Activation">
               <SettingRow label="Activation Status" sub="Error64 is activated">
-                <span style={{ color: '#107C10', fontWeight: 600 }}>✓ Activated</span>
+                <span style={{ color: '#107C10', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <FluentIcon name="check" size={14} color="#107C10" />
+                  Activated
+                </span>
               </SettingRow>
             </Subsection>
           </div>

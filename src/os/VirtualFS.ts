@@ -1,3 +1,4 @@
+
 export interface VFSNode {
   name: string;
   path: string;

@@ -2,6 +2,7 @@ import { useOS } from '../os/OSContext';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { ContextMenu } from './ContextMenu';
 import { AppIcon } from './AppIcon';
+import { VirtualFS } from '../os/VirtualFS';
 
 interface DesktopIcon {
   id: string;
@@ -20,8 +21,7 @@ interface DragState {
   draggedIds: Set<string>;
 }
 
-const GRID_W = 90;
-const GRID_H = 90;
+const DESKTOP_ICONS_KEY = 'error64_desktop_icons';
 const INITIAL_ICONS: DesktopIcon[] = [
   { id: 'this-pc', name: 'This PC', appId: 'explorer', icon: 'desktop_pc', x: 0, y: 0 },
   { id: 'recycle', name: 'Recycle Bin', appId: 'explorer', icon: 'delete', x: 0, y: 1 },
@@ -41,17 +41,32 @@ const INITIAL_ICONS: DesktopIcon[] = [
   { id: 'cmd', name: 'Command Prompt', appId: 'cmd', icon: 'prompt', x: 2, y: 3 },
   { id: 'snipping', name: 'Snipping Tool', appId: 'snipping', icon: 'screenshot', x: 2, y: 4 },
   { id: 'sticky', name: 'Sticky Notes', appId: 'sticky', icon: 'note', x: 2, y: 5 },
-  { id: 'minecraft', name: 'Minecraft Classic', appId: 'minecraft', icon: 'cube', x: 3, y: 0 },
+  { id: 'minecraft', name: 'Minecraft', appId: 'minecraft', icon: 'cube', x: 3, y: 0 },
 ];
+
+function getUniqueDesktopName(parent: string, base: string, ext: string) {
+  let index = 1;
+  let name = `${base}${ext}`;
+  while (VirtualFS.getNode(`${parent}\\${name}`)) {
+    index += 1;
+    name = `${base} (${index})${ext}`;
+  }
+  return name;
+}
 
 export function Desktop() {
   const { openWindow, settings, startMenuOpen, setStartMenuOpen, searchOpen, setSearchOpen, clipboard, setClipboard, updateSettings } = useOS();
-  const [icons, setIcons] = useState<DesktopIcon[]>(() => {
+
+  const loadDesktopIcons = () => {
     try {
-      const s = localStorage.getItem('error64_desktop_icons');
+      const s = localStorage.getItem(DESKTOP_ICONS_KEY);
       return s ? JSON.parse(s) : INITIAL_ICONS;
-    } catch { return INITIAL_ICONS; }
-  });
+    } catch {
+      return INITIAL_ICONS;
+    }
+  };
+
+  const [icons, setIcons] = useState<DesktopIcon[]>(loadDesktopIcons);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [renaming, setRenaming] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
@@ -60,8 +75,14 @@ export function Desktop() {
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [deletingIcons, setDeletingIcons] = useState<Set<string>>(new Set());
   const [wallpaperInput, setWallpaperInput] = useState<HTMLInputElement | null>(null);
+  const [iconSize, setIconSize] = useState<'large' | 'medium' | 'small'>('medium');
   const rubberStart = useRef<{ x: number; y: number } | null>(null);
   const desktopRef = useRef<HTMLDivElement>(null);
+
+  const GRID_SIZE = iconSize === 'large' ? 110 : iconSize === 'medium' ? 90 : 70;
+  const ICON_IMG_SIZE = iconSize === 'large' ? 56 : iconSize === 'medium' ? 48 : 36;
+  const GRID_W = GRID_SIZE;
+  const GRID_H = GRID_SIZE;
 
   const isCustomWallpaper = (wp: string) => wp?.startsWith('data:') || wp?.includes('/wallpapers/') || wp?.startsWith('./wallpapers/');
   
@@ -243,23 +264,38 @@ export function Desktop() {
   const desktopContextItems: { label?: string; separator?: boolean; onClick?: () => void; submenu?: { label: string; onClick: () => void }[] }[] = [
     {
       label: 'View', submenu: [
-        { label: 'Large Icons', onClick: () => {} },
-        { label: 'Medium Icons', onClick: () => {} },
-        { label: 'Small Icons', onClick: () => {} },
-      ]
-    },
-    {
-      label: 'Sort by', submenu: [
-        { label: 'Name', onClick: () => saveIcons([...icons].sort((a, b) => a.name.localeCompare(b.name))) },
-        { label: 'Date modified', onClick: () => {} },
-        { label: 'Type', onClick: () => {} },
-        { label: 'Size', onClick: () => {} },
+        { label: 'Large Icons', onClick: () => setIconSize('large') },
+        { label: 'Medium Icons', onClick: () => setIconSize('medium') },
+        { label: 'Small Icons', onClick: () => setIconSize('small') },
       ]
     },
     { label: 'Refresh', onClick: () => window.location.reload() },
     { separator: true },
-    { label: 'New Folder', onClick: () => { const name = 'New Folder'; saveIcons([...icons, { id: `folder-${Date.now()}`, name, appId: 'explorer', icon: 'folder', x: 3, y: 0 }]); } },
-    { label: 'New Text Document', onClick: () => { saveIcons([...icons, { id: `txt-${Date.now()}`, name: 'New Text Document.txt', appId: 'notepad', icon: 'document', x: 3, y: 1 }]); } },
+    { label: 'New Folder', onClick: () => {
+        const name = getUniqueDesktopName('C:\\Users\\User\\Desktop', 'New Folder', '');
+        VirtualFS.createFolder('C:\\Users\\User\\Desktop', name);
+        saveIcons([...icons, { id: `folder-${Date.now()}`, name, appId: 'explorer', icon: 'folder', x: 3, y: 0 }]);
+      } },
+    { label: 'New Text Document', onClick: () => {
+        const name = getUniqueDesktopName('C:\\Users\\User\\Desktop', 'New Text Document', '.txt');
+        VirtualFS.createFile('C:\\Users\\User\\Desktop', name, '');
+        saveIcons([...icons, { id: `txt-${Date.now()}`, name, appId: 'notepad', icon: 'notepad', x: 3, y: 1 }]);
+      } },
+    { 
+      label: 'Add App', 
+      submenu: [
+        { label: 'Browser', onClick: () => saveIcons([...icons, { id: `shortcut-${Date.now()}`, name: 'Error64 Browser', appId: 'browser', icon: 'globe', x: 3, y: 2 }]) },
+        { label: 'Calculator', onClick: () => saveIcons([...icons, { id: `shortcut-${Date.now()}`, name: 'Calculator', appId: 'calculator', icon: 'calculator', x: 3, y: 3 }]) },
+        { label: 'Notepad', onClick: () => saveIcons([...icons, { id: `shortcut-${Date.now()}`, name: 'Notepad', appId: 'notepad', icon: 'notepad', x: 3, y: 4 }]) },
+        { label: 'Settings', onClick: () => saveIcons([...icons, { id: `shortcut-${Date.now()}`, name: 'Settings', appId: 'settings', icon: 'settings', x: 3, y: 5 }]) },
+        { label: 'File Explorer', onClick: () => saveIcons([...icons, { id: `shortcut-${Date.now()}`, name: 'File Explorer', appId: 'explorer', icon: 'folder', x: 4, y: 0 }]) },
+        { label: 'Paint', onClick: () => saveIcons([...icons, { id: `shortcut-${Date.now()}`, name: 'Paint', appId: 'paint', icon: 'paint_bucket', x: 4, y: 1 }]) },
+        { label: 'Command Prompt', onClick: () => saveIcons([...icons, { id: `shortcut-${Date.now()}`, name: 'Command Prompt', appId: 'cmd', icon: 'prompt', x: 4, y: 2 }]) },
+        { label: 'Media Player', onClick: () => saveIcons([...icons, { id: `shortcut-${Date.now()}`, name: 'Media Player', appId: 'mediaplayer', icon: 'play_circle', x: 4, y: 3 }]) },
+        { label: 'Calendar', onClick: () => saveIcons([...icons, { id: `shortcut-${Date.now()}`, name: 'Calendar', appId: 'calendar', icon: 'calendar_ltr', x: 4, y: 4 }]) },
+        { label: 'Camera', onClick: () => saveIcons([...icons, { id: `shortcut-${Date.now()}`, name: 'Camera', appId: 'camera', icon: 'camera', x: 4, y: 5 }]) },
+      ]
+    },
     { separator: true },
     { label: 'Paste', onClick: () => {
       if (clipboard && clipboard.type === 'file') {
@@ -295,10 +331,7 @@ export function Desktop() {
 
   desktopContextItems.push(
     { separator: true as boolean },
-    { label: 'Display settings', onClick: () => openWindow('settings', 'Settings', 'settings', { section: 'personalization' }) },
-    { label: 'Personalize', onClick: () => openWindow('settings', 'Settings', 'settings', { section: 'personalization' }) },
-    { separator: true as boolean },
-    { label: 'Set as wallpaper', onClick: () => wallpaperInput?.click() }
+    { label: 'Display settings', onClick: () => openWindow('settings', 'Settings', 'settings', { section: 'display' }) }
   );
 
   const iconContextItems = (iconId: string) => {
@@ -401,8 +434,8 @@ export function Desktop() {
             onDoubleClick={() => handleDblClick(icon)}
             onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setSelected(new Set([icon.id])); handleContextMenu(e, icon.id); }}
           >
-            <div style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <AppIcon iconName={icon.id} size={48} />
+            <div style={{ width: ICON_IMG_SIZE, height: ICON_IMG_SIZE, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <AppIcon iconName={icon.icon} size={ICON_IMG_SIZE} />
             </div>
             {renaming === icon.id ? (
               <input
@@ -423,9 +456,9 @@ export function Desktop() {
               />
             ) : (
               <span style={{
-                fontSize: '11px', color: '#fff', textAlign: 'center', lineHeight: '1.2',
+                fontSize: iconSize === 'large' ? '12px' : iconSize === 'medium' ? '11px' : '10px', color: '#fff', textAlign: 'center', lineHeight: '1.2',
                 textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
-                wordBreak: 'break-word', maxWidth: '82px',
+                wordBreak: 'break-word', maxWidth: iconSize === 'large' ? 96 : iconSize === 'medium' ? 82 : 64,
               }}>
                 {icon.name}
               </span>

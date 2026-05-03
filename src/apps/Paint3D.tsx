@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { FluentIcon } from '../components/Window';
 
 type Tool3D = 'brush' | 'eraser' | 'fill' | 'shapes' | 'text' | 'stickers' | 'effects';
 type Shape3D = 'cube' | 'sphere' | 'cone' | 'cylinder' | 'none';
@@ -128,22 +129,22 @@ export function Paint3D() {
     ctx.restore();
   };
 
-  const TOOLS: { id: Tool3D; icon: string; label: string }[] = [
-    { id: 'brush', icon: '✏️', label: 'Brushes' },
-    { id: 'eraser', icon: '⬜', label: 'Eraser' },
-    { id: 'fill', icon: '🪣', label: 'Fill' },
-    { id: 'shapes', icon: '⬛', label: '3D Shapes' },
-    { id: 'text', icon: 'A', label: 'Text' },
-    { id: 'stickers', icon: '⭐', label: 'Stickers' },
-    { id: 'effects', icon: '✨', label: 'Effects' },
+  const TOOLS: { id: Tool3D; icon?: string; text?: string; label: string }[] = [
+    { id: 'brush', icon: 'brush', label: 'Brushes' },
+    { id: 'eraser', icon: 'eraser', label: 'Eraser' },
+    { id: 'fill', icon: 'paint_bucket', label: 'Fill' },
+    { id: 'shapes', icon: 'shapes', label: '3D Shapes' },
+    { id: 'text', text: 'A', label: 'Text' },
+    { id: 'stickers', icon: 'sticker', label: 'Stickers' },
+    { id: 'effects', icon: 'sparkles', label: 'Effects' },
   ];
 
   const SHAPES: { id: Shape3D; icon: string }[] = [
-    { id: 'none', icon: '−' },
-    { id: 'cube', icon: '⬛' },
-    { id: 'sphere', icon: '⚫' },
-    { id: 'cone', icon: '🔺' },
-    { id: 'cylinder', icon: '⬜' },
+    { id: 'none', icon: 'minus' },
+    { id: 'cube', icon: 'cube' },
+    { id: 'sphere', icon: 'sphere' },
+    { id: 'cone', icon: 'cone' },
+    { id: 'cylinder', icon: 'eraser' },
   ];
 
   return (
@@ -155,7 +156,7 @@ export function Paint3D() {
           {TOOLS.map(t => (
             <button key={t.id} title={t.label} onClick={() => setTool(t.id)}
               style={{ padding: '6px 10px', background: tool === t.id ? '#0078D4' : 'rgba(255,255,255,0.08)', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '14px', borderRadius: '2px' }}>
-              {t.icon}
+              {t.icon ? <FluentIcon name={t.icon} size={15} white /> : t.text}
             </button>
           ))}
         </div>
@@ -177,7 +178,7 @@ export function Paint3D() {
             {SHAPES.map(s => (
               <button key={s.id} onClick={() => setShape(s.id)}
                 style={{ padding: '4px 10px', background: shape === s.id ? '#0078D4' : 'rgba(255,255,255,0.08)', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '14px' }}>
-                {s.icon}
+                <FluentIcon name={s.icon} size={14} white />
               </button>
             ))}
           </>

@@ -4,14 +4,29 @@ import { FluentIcon } from './Window';
 import { AppIcon } from './AppIcon';
 import { ContextMenu } from './ContextMenu';
 
-const PINNED_APPS = [
+const DEFAULT_PINNED_APPS = [
   { appId: 'explorer', title: 'File Explorer', icon: 'folder' },
   { appId: 'browser', title: 'Error64 Browser', icon: 'globe' },
-  { appId: 'minecraft', title: 'Minecraft Classic', icon: 'cube' },
+  { appId: 'minecraft', title: 'Minecraft', icon: 'cube' },
   { appId: 'mail', title: 'Mail', icon: 'mail' },
   { appId: 'settings', title: 'Settings', icon: 'settings' },
   { appId: 'msstore', title: 'Microsoft Store', icon: 'store_microsoft' },
 ];
+
+const PINNED_KEY = 'error64_taskbar_pinned';
+
+function loadPinnedApps() {
+  try {
+    const saved = localStorage.getItem(PINNED_KEY);
+    return saved ? JSON.parse(saved) : DEFAULT_PINNED_APPS;
+  } catch {
+    return DEFAULT_PINNED_APPS;
+  }
+}
+
+function savePinnedApps(apps: typeof DEFAULT_PINNED_APPS) {
+  localStorage.setItem(PINNED_KEY, JSON.stringify(apps));
+}
 
 export function TaskBar() {
   const {
@@ -23,8 +38,9 @@ export function TaskBar() {
   } = useOS();
   const [time, setTime] = useState(new Date());
   const [volOpen, setVolOpen] = useState(false);
-  const [taskbarCtx, setTaskbarCtx] = useState<{ x: number; y: number; winId: string } | null>(null);
+  const [taskbarCtx, setTaskbarCtx] = useState<{ x: number; y: number; winId?: string; appId?: string } | null>(null);
   const [hoveredApp, setHoveredApp] = useState<string | null>(null);
+  const [pinnedApps, setPinnedApps] = useState(loadPinnedApps);
   const volRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -78,7 +94,7 @@ export function TaskBar() {
     }
   };
 
-  const runningApps = windows.filter(w => !PINNED_APPS.some(p => p.appId === w.appId));
+  const runningApps = windows.filter(w => !pinnedApps.some(p => p.appId === w.appId));
 
   return (
     <>
@@ -121,18 +137,22 @@ export function TaskBar() {
         <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.15)', margin: '0 4px' }} />
 
         {/* Pinned apps */}
-        {PINNED_APPS.map(app => {
+        {pinnedApps.map(app => {
           const isRunning = windows.some(w => w.appId === app.appId);
           const isActive = windows.some(w => w.appId === app.appId && w.id === activeWindowId);
           return (
             <TaskbarAppBtn
               key={app.appId}
               appId={app.appId}
+              icon={app.icon}
               title={app.title}
               isRunning={isRunning}
               isActive={isActive}
               onClick={() => handleAppClick(app.appId, app.title, app.icon)}
-              onContextMenu={(e) => { e.preventDefault(); /* taskbar context */ }}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                setTaskbarCtx({ x: e.clientX, y: e.clientY, appId: app.appId });
+              }}
             />
           );
         })}
@@ -251,12 +271,45 @@ export function TaskBar() {
           x={taskbarCtx.x}
           y={taskbarCtx.y - 90}
           dark={true}
-          items={[
-            { label: 'Restore', onClick: () => restoreWindow(taskbarCtx.winId) },
-            { label: 'Minimize', onClick: () => minimizeWindow(taskbarCtx.winId) },
-            { separator: true },
-            { label: 'Close window', onClick: () => closeWindow(taskbarCtx.winId) },
-          ]}
+          items={
+            taskbarCtx.appId 
+              ? [
+                  { label: 'Open', onClick: () => {
+                    const app = pinnedApps.find(p => p.appId === taskbarCtx.appId);
+                    if (app) handleAppClick(app.appId, app.title, app.icon);
+                    setTaskbarCtx(null);
+                  }},
+                  { separator: true },
+                  { label: 'Unpin from taskbar', onClick: () => {
+                    const newPinned = pinnedApps.filter(p => p.appId !== taskbarCtx.appId);
+                    setPinnedApps(newPinned);
+                    savePinnedApps(newPinned);
+                    setTaskbarCtx(null);
+                  }},
+                ]
+              : taskbarCtx.winId
+              ? [
+                  { label: 'Restore', onClick: () => { restoreWindow(taskbarCtx.winId!); setTaskbarCtx(null); } },
+                  { label: 'Minimize', onClick: () => { minimizeWindow(taskbarCtx.winId!); setTaskbarCtx(null); } },
+                  { separator: true },
+                  { 
+                    label: 'Pin to taskbar', 
+                    onClick: () => {
+                      const win = windows.find(w => w.id === taskbarCtx.winId);
+                      if (win && !pinnedApps.some(p => p.appId === win.appId)) {
+                        const newPinned = [...pinnedApps, { appId: win.appId, title: win.title, icon: win.icon }];
+                        setPinnedApps(newPinned);
+                        savePinnedApps(newPinned);
+                      }
+                      setTaskbarCtx(null);
+                    },
+                    disabled: pinnedApps.some(p => p.appId === windows.find(w => w.id === taskbarCtx.winId)?.appId)
+                  },
+                  { separator: true },
+                  { label: 'Close window', onClick: () => { closeWindow(taskbarCtx.winId!); setTaskbarCtx(null); } },
+                ]
+              : []
+          }
           onClose={() => setTaskbarCtx(null)}
         />
       )}
@@ -286,8 +339,8 @@ function TaskbarBtn({ children, title, onClick, active, width = 44 }: {
   );
 }
 
-function TaskbarAppBtn({ appId, title, isRunning, isActive, onClick, onContextMenu }: {
-  appId: string; title: string; isRunning: boolean; isActive: boolean;
+function TaskbarAppBtn({ appId, title, icon, isRunning, isActive, onClick, onContextMenu }: {
+  appId: string; title: string; icon?: string; isRunning: boolean; isActive: boolean;
   onClick: () => void; onContextMenu: (e: React.MouseEvent) => void;
 }) {
   const [hover, setHover] = useState(false);
@@ -306,7 +359,7 @@ function TaskbarAppBtn({ appId, title, isRunning, isActive, onClick, onContextMe
         transition: 'background 100ms',
       }}
     >
-      <AppIcon iconName={appId} size={20} />
+      <AppIcon iconName={icon || appId} size={20} />
       {/* Active/running indicator */}
       {isRunning && (
         <div style={{

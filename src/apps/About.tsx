@@ -21,7 +21,7 @@ export function About() {
           <span style={{ color: '#666' }}>System type</span><span style={{ fontWeight: 500 }}>x64-based OS</span>
           <span style={{ color: '#666' }}>Registered to</span><span style={{ fontWeight: 500 }}>User</span>
           <span style={{ color: '#666' }}>Processor</span><span style={{ fontWeight: 500 }}>Intel Core i5-10400</span>
-          <span style={{ color: '#666' }}>RAM</span><span style={{ fontWeight: 500 }}>8.00 GB</span>
+          <span style={{ color: '#666' }}>RAM</span><span style={{ fontWeight: 500 }}>677 GB</span>
         </div>
       </div>
 
@@ -35,7 +35,7 @@ export function About() {
         <button style={{ padding: '7px 24px', background: '#0078D4', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '13px' }}>
           OK
         </button>
-        <button onClick={() => window.open('https://github.com', '_blank')}
+        <button onClick={() => window.open('portfolioxayush.vercel.app', '_blank')}
           style={{ padding: '7px 24px', border: '1px solid #ccc', background: '#fff', cursor: 'pointer', fontSize: '13px' }}>
           License Terms
         </button>

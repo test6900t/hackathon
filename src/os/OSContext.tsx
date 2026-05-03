@@ -89,6 +89,8 @@ interface OSContextType {
   setStickyNotes: (notes: StickyNote[]) => void;
   clipboard: { type: 'text' | 'file'; content: string } | null;
   setClipboard: (c: { type: 'text' | 'file'; content: string } | null) => void;
+  undoStack: { type: 'text' | 'file'; content: string }[];
+  pushToUndo: (item: { type: 'text' | 'file'; content: string }[]) => void;
   activeWindowId: string | null;
   currentDesktop: number;
   setCurrentDesktop: (d: number) => void;
@@ -156,6 +158,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
   const [settings, setSettings] = useState<OSSettings>(loadSettings);
   const [stickyNotes, setStickyNotesRaw] = useState<StickyNote[]>(loadStickyNotes);
   const [clipboard, setClipboard] = useState<{ type: 'text' | 'file'; content: string } | null>(null);
+  const [undoStack, setUndoStack] = useState<{ type: 'text' | 'file'; content: string }[]>([]);
   const [currentDesktop, setCurrentDesktop] = useState(0);
   const [desktops, setDesktops] = useState<string[]>(['Desktop 1']);
   const audioCtx = useRef<AudioContext | null>(null);
@@ -192,6 +195,10 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
   const setStickyNotes = useCallback((notes: StickyNote[]) => {
     setStickyNotesRaw(notes);
     localStorage.setItem('error64_sticky', JSON.stringify(notes));
+  }, []);
+
+  const pushToUndo = useCallback((item: { type: 'text' | 'file'; content: string }[]) => {
+    setUndoStack(prev => [...prev, ...item].slice(-50));
   }, []);
 
   const activeWindowId = windows.reduce<string | null>((best, w) => {
@@ -345,6 +352,55 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
         if (e.key === 'a' || e.key === 'A') { e.preventDefault(); setNotifOpen(v => !v); }
         if (e.key === 'Tab') { e.preventDefault(); setTaskViewOpen(v => !v); }
       }
+      // Ctrl+Z for Undo
+      if (e.ctrlKey && e.key === 'z') {
+        e.preventDefault();
+        if (undoStack.length > 0) {
+          const lastItem = undoStack[undoStack.length - 1];
+          setClipboard(lastItem);
+          setUndoStack(prev => prev.slice(0, -1));
+        }
+      }
+      // Ctrl+X for Cut - handles both text and files
+      if (e.ctrlKey && e.key === 'x') {
+        const activeEl = document.activeElement;
+        if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) {
+          const selection = window.getSelection();
+          const text = selection?.toString() || '';
+          if (text) {
+            setClipboard({ type: 'text', content: text });
+            pushToUndo([{ type: 'text', content: text }]);
+            const target = activeEl as HTMLInputElement | HTMLTextAreaElement;
+            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+              const start = target.selectionStart || 0;
+              const end = target.selectionEnd || 0;
+              target.value = target.value.substring(0, start) + target.value.substring(end);
+              target.setSelectionRange(start, start);
+            }
+          }
+        }
+      }
+      // Ctrl+C is handled by browser natively for text
+      if (e.ctrlKey && e.key === 'c') {
+        const activeEl = document.activeElement;
+        if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) {
+          const selection = window.getSelection();
+          const text = selection?.toString() || '';
+          if (text) {
+            setClipboard({ type: 'text', content: text });
+            pushToUndo([{ type: 'text', content: text }]);
+          }
+        }
+      }
+      // Ctrl+V is handled by browser natively for text
+      if (e.ctrlKey && e.key === 'v') {
+        const activeEl = document.activeElement;
+        if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) {
+          if (clipboard?.type === 'text') {
+            pushToUndo([{ type: 'text', content: clipboard.content }]);
+          }
+        }
+      }
       if (e.altKey && e.key === 'Tab') { e.preventDefault(); setAltTabOpen(v => !v); }
       if (e.altKey && e.key === 'F4') { e.preventDefault(); if (activeWindowId) closeWindow(activeWindowId); }
       if (e.ctrlKey && e.shiftKey && e.key === 'Escape') { e.preventDefault(); openWindow('taskmanager', 'Task Manager', 'taskmanager'); }
@@ -355,7 +411,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [openWindow, closeWindow, activeWindowId, setPhase]);
+  }, [openWindow, closeWindow, activeWindowId, setPhase, undoStack, clipboard, pushToUndo]);
 
   const visibleWindows = windows.filter(w => w.desktopId === String(currentDesktop));
 
@@ -374,6 +430,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       settings, updateSettings,
       stickyNotes, setStickyNotes,
       clipboard, setClipboard,
+      undoStack, pushToUndo,
       activeWindowId,
       currentDesktop, setCurrentDesktop,
       desktops, addDesktop, removeDesktop,

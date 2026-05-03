@@ -145,7 +145,10 @@ export function TaskManager() {
                 {[['name','Name'],['cpu','CPU'],['mem','Memory'],['pid','PID']].map(([k, l]) => (
                   <th key={k} onClick={() => handleSort(k as typeof sortKey)}
                     style={{ padding: '8px 12px', textAlign: 'left', cursor: 'pointer', fontWeight: 600, borderBottom: '2px solid #ddd', userSelect: 'none' }}>
-                    {l} {sortKey === k ? (sortAsc ? '▲' : '▼') : ''}
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      {l}
+                      {sortKey === k && <FluentIcon name={sortAsc ? 'chevron_up' : 'chevron_down'} size={13} color="#0078D4" />}
+                    </span>
                   </th>
                 ))}
                 <th style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 600, borderBottom: '2px solid #ddd' }}>Status</th>
@@ -166,7 +169,12 @@ export function TaskManager() {
                   </td>
                   <td style={{ padding: '5px 12px' }}>{(p.mem / 1024).toFixed(1)} MB</td>
                   <td style={{ padding: '5px 12px', color: '#666' }}>{p.pid}</td>
-                  <td style={{ padding: '5px 12px' }}><span style={{ color: '#107C10' }}>●</span> {p.status}</td>
+                  <td style={{ padding: '5px 12px' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#107C10', display: 'inline-block' }} />
+                      {p.status}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -222,7 +230,10 @@ export function TaskManager() {
                   <td style={{ padding: '8px 12px' }}>{s.name}</td>
                   <td style={{ padding: '8px 12px', color: '#666' }}>{s.publisher}</td>
                   <td style={{ padding: '8px 12px' }}>
-                    <span style={{ color: s.status === 'Enabled' ? '#107C10' : '#888' }}>● {s.status}</span>
+                    <span style={{ color: s.status === 'Enabled' ? '#107C10' : '#888', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: s.status === 'Enabled' ? '#107C10' : '#888', display: 'inline-block' }} />
+                      {s.status}
+                    </span>
                   </td>
                   <td style={{ padding: '8px 12px' }}>
                     <span style={{ color: s.impact === 'High' ? '#D13438' : s.impact === 'Medium' ? '#CA5010' : '#107C10' }}>{s.impact}</span>
@@ -239,7 +250,7 @@ export function TaskManager() {
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#0078D4', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '18px' }}>U</div>
               <div>
                 <div style={{ fontWeight: 600 }}>User</div>
-                <div style={{ fontSize: '12px', color: '#666' }}>Active — Using {((mem * 81.92 * 0.4) / 1024).toFixed(1)} MB</div>
+                <div style={{ fontSize: '12px', color: '#666' }}>Active - Using {((mem * 81.92 * 0.4) / 1024).toFixed(1)} MB</div>
               </div>
               <div style={{ marginLeft: 'auto', fontSize: '12px', color: '#666' }}>Administrator</div>
             </div>
@@ -284,7 +295,12 @@ export function TaskManager() {
                 <tr key={s.name} style={{ borderBottom: '1px solid #f0f0f0' }}>
                   <td style={{ padding: '7px 12px', fontWeight: 500 }}>{s.name}</td>
                   <td style={{ padding: '7px 12px', color: '#555' }}>{s.description}</td>
-                  <td style={{ padding: '7px 12px' }}><span style={{ color: s.status === 'Running' ? '#107C10' : '#888' }}>● {s.status}</span></td>
+                  <td style={{ padding: '7px 12px' }}>
+                    <span style={{ color: s.status === 'Running' ? '#107C10' : '#888', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: s.status === 'Running' ? '#107C10' : '#888', display: 'inline-block' }} />
+                      {s.status}
+                    </span>
+                  </td>
                   <td style={{ padding: '7px 12px', color: '#666' }}>{s.type}</td>
                 </tr>
               ))}

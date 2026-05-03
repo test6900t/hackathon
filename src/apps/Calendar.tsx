@@ -90,9 +90,9 @@ export function Calendar() {
         {/* Mini calendar */}
         <div style={{ padding: '0 12px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <button onClick={prev} style={miniBtn}>‹</button>
+            <button onClick={prev} style={miniBtn}><FluentIcon name="chevron_left" size={14} color="#111827" /></button>
             <span style={{ fontSize: '13px', fontWeight: 600 }}>{MONTHS[month]} {year}</span>
-            <button onClick={next} style={miniBtn}>›</button>
+            <button onClick={next} style={miniBtn}><FluentIcon name="chevron_right" size={14} color="#111827" /></button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', fontSize: '11px' }}>
             {DAYS.map(d => <div key={d} style={{ textAlign: 'center', color: '#888', padding: '2px' }}>{d[0]}</div>)}
@@ -140,8 +140,8 @@ export function Calendar() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #ddd', gap: '12px', flexShrink: 0 }}>
           <button onClick={goToday} style={{ padding: '6px 16px', border: '1px solid #ddd', background: '#fff', cursor: 'pointer', fontSize: '13px' }}>Today</button>
-          <button onClick={prev} style={miniBtn}>‹</button>
-          <button onClick={next} style={miniBtn}>›</button>
+          <button onClick={prev} style={miniBtn}><FluentIcon name="chevron_left" size={14} color="#111827" /></button>
+          <button onClick={next} style={miniBtn}><FluentIcon name="chevron_right" size={14} color="#111827" /></button>
           <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 300 }}>{MONTHS[month]} {year}</h2>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: '2px' }}>
             {(['month','week','day','agenda'] as View[]).map(v => (
